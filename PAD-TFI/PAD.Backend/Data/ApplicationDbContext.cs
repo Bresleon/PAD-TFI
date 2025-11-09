@@ -172,6 +172,14 @@ public class ApplicationDbContext : DbContext
             entity.Property(t => t.TipoTransaccion)
                 .HasConversion<string>();
 
+            entity.Property(t => t.Fecha)
+                .IsRequired();
+
+            entity.HasOne(t => t.Patente)
+                .WithMany()
+                .HasForeignKey(t => t.PatenteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasOne(t => t.TitularOrigen)
                 .WithMany()
                 .HasForeignKey(t => t.TitularOrigenId)
