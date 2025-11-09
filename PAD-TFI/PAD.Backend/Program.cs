@@ -12,6 +12,16 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
+
+builder.Services.AddHttpClient("RenaperClient", client =>
+{
+    // Aqui pondremos la url que despliegue el grupo de RENAPER
+    client.BaseAddress = new Uri("https://api.renaperficticio.com/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+builder.Services.AddScoped<RenaperService>();
 
 var app = builder.Build();
 
