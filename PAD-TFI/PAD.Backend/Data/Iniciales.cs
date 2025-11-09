@@ -187,6 +187,8 @@ public class Iniciales
                 Id = 1,
                 TitularOrigenId = 1,
                 TitularDestinoId = 2,
+                PatenteId = 2,
+                Fecha = new DateOnly(2023,8,21),
                 Costo = 12500m,
                 TipoTransaccion = TipoTransaccion.TRANSFERENCIA
             },
@@ -195,6 +197,8 @@ public class Iniciales
                 Id = 2,
                 TitularOrigenId = 2,
                 TitularDestinoId = 3,
+                PatenteId = 3,
+                Fecha = new DateOnly(2024,9,23),
                 Costo = 11000m,
                 TipoTransaccion = TipoTransaccion.TRANSFERENCIA
             }
