@@ -38,7 +38,7 @@ public class TransaccionService
         var resultadoDTO = await transaccionesQuery.Select(t => new TransaccionDTO
         {
          
-            FechaTransaccion = t.Fecha,
+            FechaTransaccion = t.Fecha.ToDateTime(TimeOnly.MinValue),
             CostoOperacion = t.Costo,
             TipoTransaccion = t.TipoTransaccion.ToString(), 
 
