@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-[Route("api/[controller]")]
+[Route("api/personas")]
 [ApiController]
 public class RenaperController : ControllerBase
 {
@@ -11,7 +11,7 @@ public class RenaperController : ControllerBase
         _renaperService = renaperService;
     }
 
-    [HttpGet("persona/{cuil}")]
+    [HttpGet("/por-cuil/{cuil}")]
     public async Task<IActionResult> GetPersonaFromRenaper(string cuil)
     {
         var persona = await _renaperService.ObtenerPersonaPorCuilAsync(cuil);

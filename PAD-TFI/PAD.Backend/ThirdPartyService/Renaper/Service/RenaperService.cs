@@ -15,7 +15,7 @@ public class RenaperService
 
         var client = _httpClientFactory.CreateClient(ClientName);
 
-        string requestUri = $"api/v1/persona?cuil={cuil}";
+        string requestUri = $"api/personas/por-cuil/{cuil}";
 
         try
         {
