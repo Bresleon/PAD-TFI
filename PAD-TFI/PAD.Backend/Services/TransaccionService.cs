@@ -5,6 +5,7 @@ using PAD.Backend.DTOs;
 using PAD.Backend.Models.Entidades;
 using PAD.Backend.Models.Enums;
 using PAD.Backend.Services;
+using PAD.Backend.ThirdPartyServiceCommunication.MercadoPago.Service;
 using PAD.Backend.Utils;
 using System.Net;
 
@@ -15,14 +16,16 @@ public class TransaccionService
     private readonly TitularService _titularService;
     private readonly PatenteService _patenteService;
     private readonly VehiculoService _vehiculoService;
+    private readonly MercadoPagoService _mercadoPagoService;
 
-    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService, VehiculoService vehiculoService)
+    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService, VehiculoService vehiculoService, MercadoPagoService mercadoPagoService)
     {
         _context = context;
         _renaperService = renaperService;
         _titularService = titularService;
         _patenteService = patenteService;
         _vehiculoService = vehiculoService;
+        _mercadoPagoService = mercadoPagoService;
     }
 
     public async Task<List<TransaccionDTO>> ObtenerPorRangoDeFechaAsync(DateTime desde, DateTime? hasta)
@@ -95,6 +98,8 @@ public class TransaccionService
                                                
         decimal costoOperacion = vehiculo.Precio * PorcentajeCosto;
 
+        var preferencia = await _mercadoPagoService.CrearPreferenciaPagoAltaPatenteAsync(patente.NumeroPatente);
+
         var nuevaTransaccion = new Transaccion
         {
             Fecha = DateOnly.FromDateTime(DateTime.Today),
@@ -110,6 +115,7 @@ public class TransaccionService
 
         var resultadoDTO = new TransaccionDTO
         {
+            LinkDePagoMP = preferencia.InitPoint,
             FechaTransaccion = nuevaTransaccion.Fecha.ToDateTime(TimeOnly.MinValue),
             CostoOperacion = nuevaTransaccion.Costo,
             TipoTransaccion = nuevaTransaccion.TipoTransaccion.ToString(),

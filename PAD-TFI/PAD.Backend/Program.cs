@@ -1,7 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using PAD.Backend.Data;
+using DotNetEnv;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
+
+string renaperApiKey = builder.Configuration["RENAPER_API_KEY"]
+                        ?? throw new InvalidOperationException("La variable de entorno 'RENAPER_API_KEY' no se ha encontrado.");
 
 // Add services to the container.
 
@@ -19,7 +25,7 @@ builder.Services.AddHttpClient("RenaperClient", client =>
     // Aqui pondremos la url que despliegue el grupo de RENAPER
     client.BaseAddress = new Uri("https://renaper-simulador.onrender.com/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
-    client.DefaultRequestHeaders.Add("X-API-Key", "59260c684d0a4c6cbd08b30d07a003bb");
+    client.DefaultRequestHeaders.Add("X-API-Key", renaperApiKey);
 });
 
 builder.Services.AddScoped<RenaperService>();
