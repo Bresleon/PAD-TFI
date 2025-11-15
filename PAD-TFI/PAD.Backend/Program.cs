@@ -31,12 +31,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
-builder.Services.AddHttpClient<RenaperService>(client => 
+builder.Services.AddHttpClient("RenaperClient", client =>
 {
     client.BaseAddress = new Uri("https://renaper-simulador.onrender.com/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
     client.DefaultRequestHeaders.Add("X-API-Key", renaperApiKey);
 });
+
+
+builder.Services.AddScoped<RenaperService>();
 
 builder.Services.AddCors(options =>
 {

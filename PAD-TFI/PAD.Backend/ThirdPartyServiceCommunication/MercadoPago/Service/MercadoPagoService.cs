@@ -38,9 +38,10 @@ namespace PAD.Backend.ThirdPartyServiceCommunication.MercadoPago.Service
 
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = $"{frontendLocalUrl}/exito",
-                    Pending = $"{frontendLocalUrl}/pendiente",
-                    Failure = $"{frontendLocalUrl}/fallido"
+                    // 🚨 SOLUCIÓN: Usar una URL pública y completa para satisfacer la API
+                    Success = "https://www.google.com/mp-pago-exitoso",
+                    Pending = "https://www.google.com/mp-pago-pendiente",
+                    Failure = "https://www.google.com/mp-pago-fallido"
                 },
                 AutoReturn = "approved" 
             };
