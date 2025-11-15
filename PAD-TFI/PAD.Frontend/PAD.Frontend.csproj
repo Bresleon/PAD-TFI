@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MercadoPago" Version="1.0.4477.31589" />
+  </ItemGroup>
+
 </Project>

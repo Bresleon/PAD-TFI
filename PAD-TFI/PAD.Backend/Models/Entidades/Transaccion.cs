@@ -19,4 +19,6 @@ public class Transaccion
     public TipoTransaccion TipoTransaccion { get; set; }
 
     public decimal Costo { get; set; }
+
+    public string? ExternalReference { get; set; }
 }
