@@ -15,7 +15,7 @@ namespace PAD.Backend.Services
             _context = context;
         }
 
-        public async Task<Patente> GenerarYCrearPatenteAsync(int vehiculoId, int titularId)
+        public async Task<Patente> GenerarYCrearPatenteAsync(Vehiculo vehiculo, int titularId)
         {
             string nuevaPatenteNumero;
             bool existe;
@@ -31,7 +31,7 @@ namespace PAD.Backend.Services
             {
                 NumeroPatente = nuevaPatenteNumero,
                 Ejemplar = EjemplarPatente.A,
-                VehiculoId = vehiculoId,
+                Vehiculo = vehiculo,
                 TitularId = titularId,
                 FechaEmision = DateOnly.FromDateTime(DateTime.Today)
             };
@@ -64,6 +64,15 @@ namespace PAD.Backend.Services
         {
             return await _context.Patentes
                 .AnyAsync(p => p.VehiculoId == vehiculoId);
+        }
+        public async Task<Patente?> ObtenerPatenteYVehiculoPorNumeroAsync(string numeroPatente)
+        {
+            return await _context.Patentes
+                .Include(p => p.Vehiculo) 
+                    .ThenInclude(v => v.Marca) 
+                .Include(p => p.Vehiculo)
+                    .ThenInclude(v => v.Modelo) 
+                .FirstOrDefaultAsync(p => p.NumeroPatente == numeroPatente);
         }
     }
 }

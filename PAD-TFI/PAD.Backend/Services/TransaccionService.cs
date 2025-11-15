@@ -113,12 +113,6 @@ public class TransaccionService
     {
         await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
 
-        bool yaTienePatente = await _patenteService.VehiculoTienePatenteAsignadaAsync(request.VehiculoId);
-        if (yaTienePatente)
-        {
-            throw new InvalidOperationException($"El vehículo con ID {request.VehiculoId} ya tiene una patente asignada.");
-        }
-
         try
         {
             PersonaRenaperDto? personaRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.Titular);
@@ -129,14 +123,19 @@ public class TransaccionService
 
             var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);
 
-            var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
+            int marcaId = await _vehiculoService.ObtenerMarcaIdPorNombreAsync(request.Marca);
+            int modeloId = await _vehiculoService.ObtenerModeloIdPorNombreAsync(request.Modelo);
+            await _vehiculoService.ValidarUnicidadVehiculoAsync(
+                request.NumeroChasis,
+                request.NumeroMotor
+            );
+            var vehiculo = _vehiculoService.CrearVehiculo(
+                marcaId, modeloId, request.Categoria,
+                request.Precio, request.FechaFabricacion,
+                request.NumeroChasis, request.NumeroMotor
+            );
 
-            if (vehiculo == null)
-            {
-                throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
-            }
-
-            var patente = await _patenteService.GenerarYCrearPatenteAsync(request.VehiculoId, titular.Id);
+            var patente = await _patenteService.GenerarYCrearPatenteAsync(vehiculo, titular.Id);
 
             const decimal PorcentajeCosto = 0.05m; 
                                                
@@ -171,9 +170,9 @@ public class TransaccionService
                 NumeroPatente = patente.NumeroPatente,
                 EjemplarPatente = patente.Ejemplar.ToString(),
 
-                Marca = vehiculo.Marca.Nombre,
-                Modelo = vehiculo.Modelo.Nombre,
-                AnioFabricacion = vehiculo.FechaFabricacion.Year,
+                Marca = request.Marca,
+                Modelo = request.Modelo,
+                AnioFabricacion = request.FechaFabricacion.Year,
                 NumeroMotor = vehiculo.NumeroMotor,
                 CategoriaVehiculo = vehiculo.Categoria.ToString()
             };
@@ -192,8 +191,19 @@ public class TransaccionService
 
         try
         {
-            var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
-            if (vehiculo == null) throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
+            var patente = await _patenteService.ObtenerPatenteYVehiculoPorNumeroAsync(request.NumeroPatente);
+
+            if (patente == null)
+            {
+                throw new InvalidOperationException($"La patente '{request.NumeroPatente}' no fue encontrada.");
+            }
+
+            var vehiculo = patente.Vehiculo;
+
+            if (vehiculo == null)
+            {
+                throw new InvalidOperationException($"El vehículo asociado a la patente '{request.NumeroPatente}' no fue encontrado.");
+            }
 
             PersonaRenaperDto? personaOrigenRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularOrigen);
             PersonaRenaperDto? personaDestinoRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularDestino);
@@ -204,7 +214,6 @@ public class TransaccionService
             var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(personaOrigenRenaper);
             var titularDestino = await _titularService.ObtenerOCrearTitularAsync(personaDestinoRenaper);
 
-            var patente = await _patenteService.ObtenerPatentePorVehiculoIdAsync(request.VehiculoId);
 
             if (patente == null || patente.TitularId != titularOrigen.Id)
                 throw new Exception($"Patente no encontrada para el vehículo o el titular de origen es incorrecto.");
