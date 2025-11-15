@@ -29,7 +29,7 @@ public class TransaccionService
         _mercadoPagoService = mercadoPagoService;
     }
 
-    public async Task<List<TransaccionDTO>> ObtenerPorRangoDeFechaAsync(DateTime desde, DateTime? hasta)
+    public async Task<List<TransaccionResponseDTO>> ObtenerPorRangoDeFechaAsync(DateTime desde, DateTime? hasta)
     {
         DateOnly fechaDesde = DateOnly.FromDateTime(desde);
 
@@ -52,7 +52,7 @@ public class TransaccionService
                     .ThenInclude(v => v.Modelo);
 
        
-        var resultadoDTO = await transaccionesQuery.Select(t => new TransaccionDTO
+        var resultadoDTO = await transaccionesQuery.Select(t => new TransaccionResponseDTO
         {
          
             FechaTransaccion = t.Fecha.ToDateTime(TimeOnly.MinValue),
@@ -149,77 +149,80 @@ public class TransaccionService
 
     public async Task<TransaccionDTO> TransferirPatenteAsync(TransaccionTransferenciaRequestDto request)
     {
-        var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
-        if (vehiculo == null)
+        await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
+
+        try
         {
-            throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
+            var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
+            if (vehiculo == null) throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
+
+            PersonaRenaperDto? personaOrigenRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularOrigen);
+            PersonaRenaperDto? personaDestinoRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularDestino);
+
+            if (personaOrigenRenaper == null || personaDestinoRenaper == null)
+                throw new Exception("No se pudo obtener la información de uno o ambos titulares desde RENAPER.");
+
+            var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(personaOrigenRenaper);
+            var titularDestino = await _titularService.ObtenerOCrearTitularAsync(personaDestinoRenaper);
+
+            var patente = await _patenteService.ObtenerPatentePorVehiculoIdAsync(request.VehiculoId);
+
+            if (patente == null || patente.TitularId != titularOrigen.Id)
+                throw new Exception($"Patente no encontrada para el vehículo o el titular de origen es incorrecto.");
+
+            patente.TitularId = titularDestino.Id;
+            _context.Patentes.Update(patente);
+    
+            const decimal PorcentajeCosto = 0.015m;
+            decimal costoOperacionReal = vehiculo.Precio * PorcentajeCosto;
+            decimal montoCobro = 1.00m;
+
+            var preferencia = await _mercadoPagoService.CrearPreferenciaPagoTransferenciPatenteAsync(
+                 $"Transferencia de Patente - {patente.NumeroPatente}",
+                 montoCobro
+            );
+
+            var nuevaTransaccion = new Transaccion
+            {
+                Fecha = DateOnly.FromDateTime(DateTime.Today),
+                Costo = costoOperacionReal,
+                TipoTransaccion = TipoTransaccion.TRANSFERENCIA,
+                TitularOrigenId = titularOrigen.Id,
+                TitularDestinoId = titularDestino.Id,
+                PatenteId = patente.Id,
+                ExternalReference = preferencia.Id,
+            };
+
+            await _context.Transacciones.AddAsync(nuevaTransaccion);
+
+            await _context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+
+            return new TransaccionDTO
+            {
+                LinkDePagoMP = preferencia.InitPoint,
+                FechaTransaccion = nuevaTransaccion.Fecha.ToDateTime(TimeOnly.MinValue),
+                CostoOperacion = nuevaTransaccion.Costo,
+                TipoTransaccion = nuevaTransaccion.TipoTransaccion.ToString(),
+
+                TitularOrigen = $"{titularOrigen.Nombre} {titularOrigen.Apellido}",
+                TitularDestino = $"{titularDestino.Nombre} {titularDestino.Apellido}",
+
+                NumeroPatente = patente.NumeroPatente,
+                EjemplarPatente = patente.Ejemplar.ToString(),
+
+                Marca = vehiculo.Marca.Nombre,
+                Modelo = vehiculo.Modelo.Nombre,
+                AnioFabricacion = vehiculo.FechaFabricacion.Year,
+                NumeroMotor = vehiculo.NumeroMotor,
+                CategoriaVehiculo = vehiculo.Categoria.ToString(),
+            };
         }
-
-        PersonaRenaperDto? personaOrigenRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularOrigen);
-        PersonaRenaperDto? personaDestinoRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularDestino);
-
-        if (personaOrigenRenaper == null || personaDestinoRenaper == null)
+        catch (Exception)
         {
-            throw new Exception("No se pudo obtener la información de uno o ambos titulares desde RENAPER.");
+            await transaction.RollbackAsync();
+            throw;
         }
-
-        var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(personaOrigenRenaper);
-        var titularDestino = await _titularService.ObtenerOCrearTitularAsync(personaDestinoRenaper);
-
-        var patente = await _patenteService.ObtenerPatentePorVehiculoIdAsync(request.VehiculoId);
-
-        if (patente == null || patente.TitularId != titularOrigen.Id)
-        {
-            throw new Exception($"Patente no encontrada para el vehículo o el titular de origen es incorrecto.");
-        }
-
-        patente.TitularId = titularDestino.Id; 
-        await _patenteService.ActualizarPatenteAsync(patente);
-
-        const decimal PorcentajeCosto = 0.015m; 
-        decimal costoOperacionReal = vehiculo.Precio * PorcentajeCosto;
-
-        decimal montoCobro = 1.00m;
-        string patenteNumero = patente.NumeroPatente;
-
-        var preferencia = await _mercadoPagoService.CrearPreferenciaPagoTransferenciPatenteAsync(
-            $"Transferencia de Patente - {patenteNumero}",
-            montoCobro
-        );
-
-        var nuevaTransaccion = new Transaccion
-        {
-            Fecha = DateOnly.FromDateTime(request.FechaTransaccion),
-            Costo = costoOperacionReal, 
-            TipoTransaccion = TipoTransaccion.TRANSFERENCIA,
-            TitularOrigenId = titularOrigen.Id,
-            TitularDestinoId = titularDestino.Id,
-            PatenteId = patente.Id,
-            ExternalReference = preferencia.Id, 
-        };
-
-        await _context.Transacciones.AddAsync(nuevaTransaccion);
-        await _context.SaveChangesAsync();
-
-        return new TransaccionDTO
-        {
-            FechaTransaccion = nuevaTransaccion.Fecha.ToDateTime(TimeOnly.MinValue),
-            CostoOperacion = nuevaTransaccion.Costo,
-            TipoTransaccion = nuevaTransaccion.TipoTransaccion.ToString(),
-
-            TitularOrigen = $"{titularOrigen.Nombre} {titularOrigen.Apellido}",
-            TitularDestino = $"{titularDestino.Nombre} {titularDestino.Apellido}",
-
-            NumeroPatente = patente.NumeroPatente,
-            EjemplarPatente = patente.Ejemplar.ToString(),
-
-            Marca = vehiculo.Marca.Nombre,
-            Modelo = vehiculo.Modelo.Nombre,
-            AnioFabricacion = vehiculo.FechaFabricacion.Year,
-            NumeroMotor = vehiculo.NumeroMotor,
-            CategoriaVehiculo = vehiculo.Categoria.ToString(),
-
-            LinkDePagoMP = preferencia.InitPoint 
-        };
     }
 }

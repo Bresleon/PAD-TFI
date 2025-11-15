@@ -8,7 +8,7 @@ namespace PAD.Backend.ThirdPartyServiceCommunication.MercadoPago.Service
     {
         private readonly IConfiguration _configuration;
         private const string MpAccessTokenKey = "MP_ACCESS_TOKEN";
-        private readonly string frontendLocalUrl = "http://localhost:4200/pagos"; // hay que ver con que puerto se levanta el front en local
+        
 
         public MercadoPagoService(IConfiguration configuration)
         {
@@ -68,9 +68,10 @@ namespace PAD.Backend.ThirdPartyServiceCommunication.MercadoPago.Service
 
                 BackUrls = new PreferenceBackUrlsRequest
                 {
-                    Success = $"{frontendLocalUrl}/exito",
-                    Pending = $"{frontendLocalUrl}/pendiente",
-                    Failure = $"{frontendLocalUrl}/fallido"
+                    // 🚨 SOLUCIÓN: Usar una URL pública y completa para satisfacer la API
+                    Success = "https://localhost:7121/",
+                    Pending = "https://www.google.com/mp-pago-pendiente",
+                    Failure = "https://www.google.com/mp-pago-fallido"
                 },
                 AutoReturn = "approved"
             };

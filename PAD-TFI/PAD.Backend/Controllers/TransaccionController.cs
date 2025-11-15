@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PAD.Backend.Dtos;
 using PAD.Backend.DTOs;
 using PAD.Backend.Models.Entidades;
+using System.ComponentModel.DataAnnotations;
 
 [Route("api/transacciones")]
 [ApiController]
@@ -32,12 +33,12 @@ public class TransaccionesController : ControllerBase
 
 
     [HttpGet("obtener-por-rango")]
-    [ProducesResponseType(typeof(List<TransaccionDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<TransaccionResponseDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetTransaccionesPorRango(
-        [FromQuery] DateTime desde,
+        [FromQuery, Required] DateTime desde,
         [FromQuery] DateTime? hasta = null)
     {
-    
         var transacciones = await _transaccionService.ObtenerPorRangoDeFechaAsync(desde, hasta);
 
         if (transacciones == null || !transacciones.Any())
