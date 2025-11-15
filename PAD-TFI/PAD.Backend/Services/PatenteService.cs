@@ -15,7 +15,7 @@ namespace PAD.Backend.Services
             _context = context;
         }
 
-        public async Task<Patente> GenerarYCrearPatenteAsync(int vehiculoId, int titularId)
+        public async Task<Patente> GenerarYCrearPatenteAsync(Vehiculo vehiculo, int titularId)
         {
             string nuevaPatenteNumero;
             bool existe;
@@ -31,7 +31,7 @@ namespace PAD.Backend.Services
             {
                 NumeroPatente = nuevaPatenteNumero,
                 Ejemplar = EjemplarPatente.A,
-                VehiculoId = vehiculoId,
+                Vehiculo = vehiculo,
                 TitularId = titularId,
                 FechaEmision = DateOnly.FromDateTime(DateTime.Today)
             };

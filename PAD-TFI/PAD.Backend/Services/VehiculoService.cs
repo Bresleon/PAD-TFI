@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PAD.Backend.Data;
 using PAD.Backend.Models.Entidades;
+using PAD.Backend.Models.Enums;
 
 namespace PAD.Backend.Services
 {
@@ -20,6 +21,51 @@ namespace PAD.Backend.Services
                 .Include(v => v.Marca)
                 .Include(v => v.Modelo)
                 .FirstOrDefaultAsync(v => v.Id == vehiculoId);
+        }
+
+        public async Task<int> ObtenerMarcaIdPorNombreAsync(string nombreMarca)
+        {
+            var marca = await _context.Marcas
+                .AsNoTracking() 
+                .FirstOrDefaultAsync(m => m.Nombre == nombreMarca);
+
+            if (marca == null)
+            {
+                throw new InvalidOperationException($"La marca '{nombreMarca}' no está registrada en la base de datos.");
+            }
+            return marca.Id;
+        }
+        public async Task<int> ObtenerModeloIdPorNombreAsync(string nombreModelo)
+        {
+            var modelo = await _context.Modelos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Nombre == nombreModelo);
+
+            if (modelo == null)
+            {
+                throw new InvalidOperationException($"El modelo '{nombreModelo}' no está registrado en la base de datos.");
+            }
+            return modelo.Id;
+        }
+    
+        public Vehiculo CrearVehiculo(
+            int marcaId, int modeloId, CategoriaVehiculo categoria,
+            decimal precio, DateOnly fechaFabricacion,
+            string numeroChasis, string numeroMotor)
+        {
+            var vehiculo = new Vehiculo
+            {
+                MarcaId = marcaId,
+                ModeloId = modeloId,
+                Categoria = categoria,
+                Precio = precio,
+                FechaFabricacion = fechaFabricacion,
+                NumeroChasis = numeroChasis,
+                NumeroMotor = numeroMotor
+            };
+
+            _context.Vehiculos.Add(vehiculo);
+            return vehiculo;
         }
     }
 }

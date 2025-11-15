@@ -80,12 +80,6 @@ public class TransaccionService
     {
         await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
 
-        bool yaTienePatente = await _patenteService.VehiculoTienePatenteAsignadaAsync(request.VehiculoId);
-        if (yaTienePatente)
-        {
-            throw new InvalidOperationException($"El vehículo con ID {request.VehiculoId} ya tiene una patente asignada.");
-        }
-
         try
         {
             PersonaRenaperDto? personaRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.Titular);
@@ -96,14 +90,16 @@ public class TransaccionService
 
             var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);
 
-            var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
+            int marcaId = await _vehiculoService.ObtenerMarcaIdPorNombreAsync(request.Marca);
+            int modeloId = await _vehiculoService.ObtenerModeloIdPorNombreAsync(request.Modelo);
 
-            if (vehiculo == null)
-            {
-                throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
-            }
+            var vehiculo = _vehiculoService.CrearVehiculo(
+                marcaId, modeloId, request.Categoria,
+                request.Precio, request.FechaFabricacion,
+                request.NumeroChasis, request.NumeroMotor
+            );
 
-            var patente = await _patenteService.GenerarYCrearPatenteAsync(request.VehiculoId, titular.Id);
+            var patente = await _patenteService.GenerarYCrearPatenteAsync(vehiculo, titular.Id);
 
             const decimal PorcentajeCosto = 0.05m; 
                                                
@@ -138,9 +134,9 @@ public class TransaccionService
                 NumeroPatente = patente.NumeroPatente,
                 EjemplarPatente = patente.Ejemplar.ToString(),
 
-                Marca = vehiculo.Marca.Nombre,
-                Modelo = vehiculo.Modelo.Nombre,
-                AnioFabricacion = vehiculo.FechaFabricacion.Year,
+                Marca = request.Marca,
+                Modelo = request.Modelo,
+                AnioFabricacion = request.FechaFabricacion.Year,
                 NumeroMotor = vehiculo.NumeroMotor,
                 CategoriaVehiculo = vehiculo.Categoria.ToString()
             };
