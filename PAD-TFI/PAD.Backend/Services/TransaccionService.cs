@@ -125,7 +125,10 @@ public class TransaccionService
 
             int marcaId = await _vehiculoService.ObtenerMarcaIdPorNombreAsync(request.Marca);
             int modeloId = await _vehiculoService.ObtenerModeloIdPorNombreAsync(request.Modelo);
-
+            await _vehiculoService.ValidarUnicidadVehiculoAsync(
+                request.NumeroChasis,
+                request.NumeroMotor
+            );
             var vehiculo = _vehiculoService.CrearVehiculo(
                 marcaId, modeloId, request.Categoria,
                 request.Precio, request.FechaFabricacion,
@@ -188,8 +191,19 @@ public class TransaccionService
 
         try
         {
-            var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
-            if (vehiculo == null) throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
+            var patente = await _patenteService.ObtenerPatenteYVehiculoPorNumeroAsync(request.NumeroPatente);
+
+            if (patente == null)
+            {
+                throw new InvalidOperationException($"La patente '{request.NumeroPatente}' no fue encontrada.");
+            }
+
+            var vehiculo = patente.Vehiculo;
+
+            if (vehiculo == null)
+            {
+                throw new InvalidOperationException($"El vehículo asociado a la patente '{request.NumeroPatente}' no fue encontrado.");
+            }
 
             PersonaRenaperDto? personaOrigenRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularOrigen);
             PersonaRenaperDto? personaDestinoRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularDestino);
@@ -200,7 +214,6 @@ public class TransaccionService
             var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(personaOrigenRenaper);
             var titularDestino = await _titularService.ObtenerOCrearTitularAsync(personaDestinoRenaper);
 
-            var patente = await _patenteService.ObtenerPatentePorVehiculoIdAsync(request.VehiculoId);
 
             if (patente == null || patente.TitularId != titularOrigen.Id)
                 throw new Exception($"Patente no encontrada para el vehículo o el titular de origen es incorrecto.");

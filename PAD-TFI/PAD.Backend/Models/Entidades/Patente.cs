@@ -1,7 +1,9 @@
-﻿using PAD.Backend.Models.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using PAD.Backend.Models.Enums;
 
 namespace PAD.Backend.Models.Entidades;
 
+[Index(nameof(NumeroPatente), IsUnique = true)]
 public class Patente
 {
     public int Id { get; set; }

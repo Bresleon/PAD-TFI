@@ -26,7 +26,7 @@ namespace PAD.Backend.Services
         public async Task<int> ObtenerMarcaIdPorNombreAsync(string nombreMarca)
         {
             var marca = await _context.Marcas
-                .AsNoTracking() 
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Nombre == nombreMarca);
 
             if (marca == null)
@@ -47,7 +47,7 @@ namespace PAD.Backend.Services
             }
             return modelo.Id;
         }
-    
+
         public Vehiculo CrearVehiculo(
             int marcaId, int modeloId, CategoriaVehiculo categoria,
             decimal precio, DateOnly fechaFabricacion,
@@ -66,6 +66,26 @@ namespace PAD.Backend.Services
 
             _context.Vehiculos.Add(vehiculo);
             return vehiculo;
+        }
+    
+
+    public async Task ValidarUnicidadVehiculoAsync(string numeroChasis, string numeroMotor)
+        {
+            bool chasisExiste = await _context.Vehiculos
+                .AnyAsync(v => v.NumeroChasis == numeroChasis);
+
+            if (chasisExiste)
+            {
+                throw new InvalidOperationException($"El Número de Chasis '{numeroChasis}' ya se encuentra registrado.");
+            }
+
+            bool motorExiste = await _context.Vehiculos
+                .AnyAsync(v => v.NumeroMotor == numeroMotor);
+
+            if (motorExiste)
+            {
+                throw new InvalidOperationException($"El Número de Motor '{numeroMotor}' ya se encuentra registrado.");
+            }
         }
     }
 }

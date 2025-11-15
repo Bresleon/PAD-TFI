@@ -1,7 +1,10 @@
-﻿using PAD.Backend.Models.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using PAD.Backend.Models.Enums;
 
 namespace PAD.Backend.Models.Entidades;
 
+[Index(nameof(NumeroChasis), IsUnique = true)]
+[Index(nameof(NumeroMotor), IsUnique = true)]
 public class Vehiculo
 {
     public int Id { get; set; }

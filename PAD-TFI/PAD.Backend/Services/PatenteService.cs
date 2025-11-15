@@ -65,5 +65,14 @@ namespace PAD.Backend.Services
             return await _context.Patentes
                 .AnyAsync(p => p.VehiculoId == vehiculoId);
         }
+        public async Task<Patente?> ObtenerPatenteYVehiculoPorNumeroAsync(string numeroPatente)
+        {
+            return await _context.Patentes
+                .Include(p => p.Vehiculo) 
+                    .ThenInclude(v => v.Marca) 
+                .Include(p => p.Vehiculo)
+                    .ThenInclude(v => v.Modelo) 
+                .FirstOrDefaultAsync(p => p.NumeroPatente == numeroPatente);
+        }
     }
 }
