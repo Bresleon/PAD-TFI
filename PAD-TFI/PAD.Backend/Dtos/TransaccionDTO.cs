@@ -2,6 +2,7 @@ namespace PAD.Backend.DTOs;
 
 public class TransaccionDTO
 {
+    public string LinkDePagoMP { get; set; }
 
     public DateTime FechaTransaccion { get; set; }
     public string? TitularOrigen { get; set; } 

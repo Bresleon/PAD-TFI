@@ -3,7 +3,7 @@ using PAD.Backend.Dtos;
 using PAD.Backend.DTOs;
 using PAD.Backend.Models.Entidades;
 
-[Route("api/[controller]")]
+[Route("api/transacciones")]
 [ApiController]
 public class TransaccionesController : ControllerBase
 {
@@ -21,10 +21,17 @@ public class TransaccionesController : ControllerBase
         var transaccion = await _transaccionService.GenerarNuevaPatenteAsync(request);
         return Ok(transaccion);
     }
-   
+    [HttpPost("transferir-patente")]
+    [ProducesResponseType(typeof(TransaccionDTO), StatusCodes.Status201Created)]
+    public async Task<IActionResult> TransferirPatente(TransaccionTransferenciaRequestDto request)
+    {
+        var transaccion = await _transaccionService.TransferirPatenteAsync(request);
+        return Ok(transaccion);
+    }
 
 
-    [HttpGet("rango")]
+
+    [HttpGet("obtener-por-rango")]
     [ProducesResponseType(typeof(List<TransaccionDTO>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetTransaccionesPorRango(
         [FromQuery] DateTime desde,
