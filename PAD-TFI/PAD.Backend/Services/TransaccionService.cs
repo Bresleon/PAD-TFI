@@ -80,6 +80,12 @@ public class TransaccionService
     {
         await using IDbContextTransaction transaction = await _context.Database.BeginTransactionAsync();
 
+        bool yaTienePatente = await _patenteService.VehiculoTienePatenteAsignadaAsync(request.VehiculoId);
+        if (yaTienePatente)
+        {
+            throw new InvalidOperationException($"El vehículo con ID {request.VehiculoId} ya tiene una patente asignada.");
+        }
+
         try
         {
             PersonaRenaperDto? personaRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.Titular);
