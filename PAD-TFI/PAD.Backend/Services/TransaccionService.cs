@@ -1,15 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using PAD.Backend.Data;
+using PAD.Backend.Dtos;
 using PAD.Backend.DTOs;
 using PAD.Backend.Models.Entidades;
+using PAD.Backend.Models.Enums;
+using PAD.Backend.Services;
+using PAD.Backend.Utils;
+using System.Net;
 
 public class TransaccionService
 {
     private readonly ApplicationDbContext _context;
+    private readonly RenaperService _renaperService;
+    private readonly TitularService _titularService;
+    private readonly PatenteService _patenteService;
 
-    public TransaccionService(ApplicationDbContext context)
+    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService)
     {
         _context = context;
+        _renaperService = renaperService;
+        _titularService = titularService;
+        _patenteService = patenteService;
     }
 
     public async Task<List<TransaccionDTO>> ObtenerPorRangoDeFechaAsync(DateTime desde, DateTime? hasta)
@@ -57,5 +68,20 @@ public class TransaccionService
         }).ToListAsync();
 
         return resultadoDTO;
+    }
+
+    public async Task<TransaccionDTO> GenerarNuevaPatenteAsync(TransaccionAltaRequestDto request)
+    {
+        PersonaRenaperDto? personaRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.Titular);
+        if (personaRenaper == null)
+        {
+            throw new Exception("No se pudo obtener la información de la persona desde RENAPER.");
+        }
+
+        var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);    
+
+        var patente = await _patenteService.GenerarYCrearPatenteAsync(request.VehiculoId, titular.Id);
+
+        throw new NotImplementedException();
     }
 }
