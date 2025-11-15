@@ -14,13 +14,15 @@ public class TransaccionService
     private readonly RenaperService _renaperService;
     private readonly TitularService _titularService;
     private readonly PatenteService _patenteService;
+    private readonly VehiculoService _vehiculoService;
 
-    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService)
+    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService, VehiculoService vehiculoService)
     {
         _context = context;
         _renaperService = renaperService;
         _titularService = titularService;
         _patenteService = patenteService;
+        _vehiculoService = vehiculoService;
     }
 
     public async Task<List<TransaccionDTO>> ObtenerPorRangoDeFechaAsync(DateTime desde, DateTime? hasta)
@@ -78,10 +80,53 @@ public class TransaccionService
             throw new Exception("No se pudo obtener la información de la persona desde RENAPER.");
         }
 
-        var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);    
+        var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);
+
+        var vehiculo = await _vehiculoService.ObtenerVehiculoPorIdAsync(request.VehiculoId);
+
+        if (vehiculo == null)
+        {
+            throw new Exception($"Vehículo con ID {request.VehiculoId} no encontrado.");
+        }
 
         var patente = await _patenteService.GenerarYCrearPatenteAsync(request.VehiculoId, titular.Id);
 
-        throw new NotImplementedException();
+        const decimal PorcentajeCosto = 0.05m; 
+                                               
+        decimal costoOperacion = vehiculo.Precio * PorcentajeCosto;
+
+        var nuevaTransaccion = new Transaccion
+        {
+            Fecha = DateOnly.FromDateTime(DateTime.Today),
+            Costo = costoOperacion,
+            TipoTransaccion = TipoTransaccion.ALTA,
+            TitularDestinoId = titular.Id,
+            PatenteId = patente.Id,
+        };
+
+        await _context.Transacciones.AddAsync(nuevaTransaccion);
+        await _context.SaveChangesAsync();
+
+
+        var resultadoDTO = new TransaccionDTO
+        {
+            FechaTransaccion = nuevaTransaccion.Fecha.ToDateTime(TimeOnly.MinValue),
+            CostoOperacion = nuevaTransaccion.Costo,
+            TipoTransaccion = nuevaTransaccion.TipoTransaccion.ToString(),
+
+            TitularOrigen = "N/A (Alta)",
+            TitularDestino = $"{titular.Nombre} {titular.Apellido}",
+
+            NumeroPatente = patente.NumeroPatente,
+            EjemplarPatente = patente.Ejemplar.ToString(),
+
+            Marca = vehiculo.Marca.Nombre,
+            Modelo = vehiculo.Modelo.Nombre,
+            AnioFabricacion = vehiculo.FechaFabricacion.Year,
+            NumeroMotor = vehiculo.NumeroMotor,
+            CategoriaVehiculo = vehiculo.Categoria.ToString()
+        };
+
+        return resultadoDTO;
     }
 }
