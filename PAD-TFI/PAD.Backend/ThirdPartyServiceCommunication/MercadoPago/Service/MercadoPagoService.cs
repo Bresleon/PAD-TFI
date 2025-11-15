@@ -39,7 +39,7 @@ namespace PAD.Backend.ThirdPartyServiceCommunication.MercadoPago.Service
                 BackUrls = new PreferenceBackUrlsRequest
                 {
                     // 🚨 SOLUCIÓN: Usar una URL pública y completa para satisfacer la API
-                    Success = "https://www.google.com/mp-pago-exitoso",
+                    Success = "https://localhost:7121/",
                     Pending = "https://www.google.com/mp-pago-pendiente",
                     Failure = "https://www.google.com/mp-pago-fallido"
                 },

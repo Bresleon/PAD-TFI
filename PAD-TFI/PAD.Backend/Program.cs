@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             // Hay que ver que puertos usa el front en local
-            policy.WithOrigins("http://localhost:4200", "http://localhost:3000")
+            policy.WithOrigins("http://localhost:7121", "http://localhost:3000")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });

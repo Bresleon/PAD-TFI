@@ -117,7 +117,7 @@ public class TransaccionService
 
             await _context.Transacciones.AddAsync(nuevaTransaccion);
             await _context.SaveChangesAsync();
-
+            await transaction.CommitAsync();
 
             var resultadoDTO = new TransaccionDTO
             {
