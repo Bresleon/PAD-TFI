@@ -1,0 +1,24 @@
+﻿@model PAD.Frontend.Dtos.TransaccionDTO
+
+<h2>Resultado</h2>
+
+<div class="card mt-4">
+    <div class="card-body">
+
+        <h4>@Model.TipoTransaccion</h4>
+        <p><strong>Fecha:</strong> @Model.FechaTransaccion</p>
+        <p><strong>Titular Destino:</strong> @Model.TitularDestino</p>
+        <p><strong>Marca:</strong> @Model.Marca</p>
+        <p><strong>Modelo:</strong> @Model.Modelo</p>
+        <p><strong>Año Fabricación:</strong> @Model.AnioFabricacion</p>
+        <p><strong>Patente:</strong> @Model.NumeroPatente (@Model.EjemplarPatente)</p>
+        <p><strong>Costo:</strong> $@Model.CostoOperacion</p>
+
+        @if (!string.IsNullOrEmpty(Model.LinkDePagoMP))
+        {
+            <a href="@Model.LinkDePagoMP" target="_blank" class="btn btn-success mt-3">
+                Ir al Pago
+            </a>
+        }
+    </div>
+</div>

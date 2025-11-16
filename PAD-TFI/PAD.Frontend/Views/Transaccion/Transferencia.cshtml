@@ -1,0 +1,28 @@
+﻿@model PAD.Frontend.Dtos.TransaccionTransferenciaRequestDto
+
+<h2>Transferencia de Patente</h2>
+
+<form asp-action="Transferencia" method="post" class="mt-4">
+
+    <div class="mb-3">
+        <label>Titular Origen</label>
+        <input asp-for="TitularOrigen" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Titular Destino</label>
+        <input asp-for="TitularDestino" class="form-control" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Número de Patente</label>
+        <input asp-for="NumeroPatente" class="form-control" required />
+    </div>
+
+    <button class="btn btn-primary mt-3">Transferir</button>
+</form>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
+}

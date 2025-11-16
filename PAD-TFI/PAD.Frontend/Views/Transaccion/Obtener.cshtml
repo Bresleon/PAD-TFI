@@ -1,0 +1,18 @@
+﻿<h2>Buscar Transacciones por Rango de Fecha</h2>
+
+<form asp-action="Obtener" method="post" class="mt-4">
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label>Desde</label>
+            <input name="desde" class="form-control" type="date" required />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label>Hasta (opcional)</label>
+            <input name="hasta" class="form-control" type="date" />
+        </div>
+    </div>
+
+    <button class="btn btn-primary mt-3">Buscar</button>
+</form>
