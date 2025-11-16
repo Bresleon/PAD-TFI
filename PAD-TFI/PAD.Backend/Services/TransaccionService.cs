@@ -13,16 +13,14 @@ using System.Net;
 public class TransaccionService
 {
     private readonly ApplicationDbContext _context;
-    private readonly RenaperService _renaperService;
     private readonly TitularService _titularService;
     private readonly PatenteService _patenteService;
     private readonly VehiculoService _vehiculoService;
     private readonly MercadoPagoService _mercadoPagoService;
 
-    public TransaccionService(ApplicationDbContext context, RenaperService renaperService, TitularService titularService, PatenteService patenteService, VehiculoService vehiculoService, MercadoPagoService mercadoPagoService)
+    public TransaccionService(ApplicationDbContext context,  TitularService titularService, PatenteService patenteService, VehiculoService vehiculoService, MercadoPagoService mercadoPagoService)
     {
         _context = context;
-        _renaperService = renaperService;
         _titularService = titularService;
         _patenteService = patenteService;
         _vehiculoService = vehiculoService;
@@ -115,13 +113,7 @@ public class TransaccionService
 
         try
         {
-            PersonaRenaperDto? personaRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.Titular);
-            if (personaRenaper == null)
-            {
-                throw new Exception("No se pudo obtener la información de la persona desde RENAPER.");
-            }
-
-            var titular = await _titularService.ObtenerOCrearTitularAsync(personaRenaper);
+            var titular = await _titularService.ObtenerOCrearTitularAsync(request.Titular);
 
             int marcaId = await _vehiculoService.ObtenerMarcaIdPorNombreAsync(request.Marca);
             int modeloId = await _vehiculoService.ObtenerModeloIdPorNombreAsync(request.Modelo);
@@ -205,14 +197,8 @@ public class TransaccionService
                 throw new InvalidOperationException($"El vehículo asociado a la patente '{request.NumeroPatente}' no fue encontrado.");
             }
 
-            PersonaRenaperDto? personaOrigenRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularOrigen);
-            PersonaRenaperDto? personaDestinoRenaper = await _renaperService.ObtenerPersonaPorCuilAsync(request.TitularDestino);
-
-            if (personaOrigenRenaper == null || personaDestinoRenaper == null)
-                throw new Exception("No se pudo obtener la información de uno o ambos titulares desde RENAPER.");
-
-            var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(personaOrigenRenaper);
-            var titularDestino = await _titularService.ObtenerOCrearTitularAsync(personaDestinoRenaper);
+            var titularOrigen = await _titularService.ObtenerOCrearTitularAsync(request.TitularOrigen);
+            var titularDestino = await _titularService.ObtenerOCrearTitularAsync(request.TitularDestino);
 
 
             if (patente == null || patente.TitularId != titularOrigen.Id)
