@@ -2,27 +2,74 @@
 
 <h2>Transferencia de Patente</h2>
 
-<form asp-action="Transferencia" method="post" class="mt-4">
+<div class="mt-4">
 
     <div class="mb-3">
         <label>Titular Origen</label>
-        <input asp-for="TitularOrigen" class="form-control" required />
+        <input id="titularOrigen" class="form-control" required />
     </div>
 
     <div class="mb-3">
         <label>Titular Destino</label>
-        <input asp-for="TitularDestino" class="form-control" required />
+        <input id="titularDestino" class="form-control" required />
     </div>
 
     <div class="mb-3">
         <label>Número de Patente</label>
-        <input asp-for="NumeroPatente" class="form-control" required />
+        <input id="numeroPatente" class="form-control" required />
     </div>
 
-    <button class="btn btn-primary mt-3">Transferir</button>
-</form>
+    <button class="btn btn-primary mt-3" onclick="transferir()">Transferir</button>
 
-@if (ViewBag.Error != null)
-{
-    <div class="alert alert-danger mt-3">@ViewBag.Error</div>
-}
+    <div id="loading" class="alert alert-info mt-3" style="display:none;">
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+            <span>Procesando transferencia, por favor espere...</span>
+        </div>
+    </div>
+
+    <div id="msgTransferencia" class="mt-3"></div>
+</div>
+
+<script>
+    async function transferir() {
+        const dto = {
+            titularOrigen: document.getElementById("titularOrigen").value,
+            titularDestino: document.getElementById("titularDestino").value,
+            numeroPatente: document.getElementById("numeroPatente").value
+        };
+
+        console.log("JSON enviado:", JSON.stringify(dto));
+
+        const loading = document.getElementById("loading");
+        loading.style.display = "block";
+
+        const res = await fetch("/Transaccion/Transferencia", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dto)
+        });
+
+        loading.style.display = "none";
+
+        const msg = document.getElementById("msgTransferencia");
+
+        if (!res.ok) {
+            msg.innerHTML = `<div class="alert alert-danger">Error al transferir patente</div>`;
+            return;
+        }
+
+        const data = await res.json();
+
+        msg.innerHTML = `
+            <div class="alert alert-success">
+                Transferencia exitosa!<br>
+                <b>Link de pago:</b> <a href="${data.linkDePagoMP}" target="_blank">Ir a MercadoPago</a><br>
+                <b>Titular Origen:</b> ${data.titularOrigen}<br>
+                <b>Titular Destino:</b> ${data.titularDestino}<br>
+                <b>Patente:</b> ${data.numeroPatente}
+            </div>`;
+    }
+</script>

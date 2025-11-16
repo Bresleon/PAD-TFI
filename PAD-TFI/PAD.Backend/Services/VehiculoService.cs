@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PAD.Backend.Data;
+using PAD.Backend.Dtos;
 using PAD.Backend.Models.Entidades;
 using PAD.Backend.Models.Enums;
 
@@ -86,6 +87,34 @@ namespace PAD.Backend.Services
             {
                 throw new InvalidOperationException($"El Número de Motor '{numeroMotor}' ya se encuentra registrado.");
             }
+        }
+
+        public async Task<VehiculoResponseDto?> ObtenerVehiculoPorPatenteAsync(string patenteNumero)
+        {
+            var vehiculoDto = await _context.Patentes
+                .AsNoTracking()
+
+                .Include(p => p.Vehiculo) 
+                    .ThenInclude(v => v.Marca) 
+                .Include(p => p.Vehiculo)
+                    .ThenInclude(v => v.Modelo) 
+
+                .Where(p => p.NumeroPatente == patenteNumero)
+
+              
+                .Select(p => new VehiculoResponseDto 
+                {
+                    Marca = p.Vehiculo.Marca.Nombre,
+                    Modelo = p.Vehiculo.Modelo.Nombre,
+                    Categoria = p.Vehiculo.Categoria.ToString(),
+                    Precio = p.Vehiculo.Precio,
+                    FechaFabricacion = p.Vehiculo.FechaFabricacion,
+                    NumeroChasis = p.Vehiculo.NumeroChasis,
+                    NumeroMotor = p.Vehiculo.NumeroMotor
+                })
+                .FirstOrDefaultAsync();
+
+            return vehiculoDto;
         }
     }
 }

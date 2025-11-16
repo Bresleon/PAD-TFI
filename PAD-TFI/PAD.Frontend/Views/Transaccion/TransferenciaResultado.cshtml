@@ -1,0 +1,17 @@
+﻿@model TransaccionTransferenciaResponseDto
+
+<h2>Transferencia realizada correctamente</h2>
+
+<div class="mt-4">
+    <p><strong>Link de pago:</strong> <a href="@Model.LinkDePagoMP" target="_blank">Ir al pago</a></p>
+    <p><strong>Titular Origen:</strong> @Model.TitularOrigen</p>
+    <p><strong>Titular Destino:</strong> @Model.TitularDestino</p>
+    <p><strong>Marca:</strong> @Model.Marca</p>
+    <p><strong>Modelo:</strong> @Model.Modelo</p>
+    <p><strong>Año:</strong> @Model.AnioFabricacion</p>
+    <p><strong>Número de Motor:</strong> @Model.NumeroMotor</p>
+    <p><strong>Número de Patente:</strong> @Model.NumeroPatente</p>
+    <p><strong>Ejemplar:</strong> @Model.EjemplarPatente</p>
+</div>
+
+<a href="/Transaccion/Transferencia" class="btn btn-primary mt-3">Hacer otra transferencia</a>

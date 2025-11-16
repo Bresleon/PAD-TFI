@@ -25,7 +25,6 @@ namespace PAD.Frontend.Services
             var url = $"https://localhost:7213/api/personas/por-cuil/{cuil}";
             return await _http.GetFromJsonAsync<PersonaResponseDto>(url, _jsonOptions);
         }
-
         public async Task<TransaccionResponseDto?> GenerarNuevaPatente(TransaccionAltaRequestDto dto)
         {
             var url = $"https://localhost:7213/api/transacciones/generar-nueva-patente";
@@ -42,6 +41,27 @@ namespace PAD.Frontend.Services
 
             return JsonSerializer.Deserialize<TransaccionResponseDto>(raw, _jsonOptions);
         }
+        public async Task<TransaccionTransferenciaResponseDto> TransferirPatente(TransaccionTransferenciaRequestDto dto)
+        {
+            var url = $"https://localhost:7213/api/transacciones/transferir-patente";
+            try
+            {
+                var response = await _http.PostAsJsonAsync(url, dto);
+                Console.WriteLine("respuesta TRANSFERENCIA desde servicio --> " + response);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Backend error Transferencia --> " + error);
+                    return null;
+                }
 
+                return await response.Content.ReadFromJsonAsync<TransaccionTransferenciaResponseDto>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error en TransferirPatente: " + ex.Message);
+                return null;
+            }
+        }
     }
 }

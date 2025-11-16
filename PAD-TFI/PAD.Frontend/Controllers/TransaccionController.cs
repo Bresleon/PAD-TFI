@@ -28,7 +28,7 @@ namespace PAD.Frontend.Controllers
 
             if (persona is null)
                 return NotFound("Persona no encontrada");
-
+            
             return Json(persona);
         }
 
@@ -47,13 +47,26 @@ namespace PAD.Frontend.Controllers
             }
         }
 
-
-
-
+        [HttpGet]
         public IActionResult Transferencia()
         {
-            return View();
+            return View(new TransaccionTransferenciaRequestDto());
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Transferencia([FromBody] TransaccionTransferenciaRequestDto request)
+        {
+            try
+            {
+                var response = await _service.TransferirPatente(request);
+                return Json(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
 
         public IActionResult Obtener()
         {
