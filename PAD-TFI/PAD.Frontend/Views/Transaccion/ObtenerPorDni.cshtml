@@ -1,0 +1,49 @@
+﻿@model List<TransaccionDto>
+
+<h2>Buscar Transacciones por DNI</h2>
+
+<form asp-action="ObtenerPorDni" method="get" class="mt-4">
+    <div class="col-md-6 mb-3">
+        <label>DNI</label>
+        <input name="dni" class="form-control" required />
+    </div>
+
+    <button class="btn btn-primary mt-3">Buscar</button>
+</form>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Patente</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Costo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.FechaTransaccion.ToString("yyyy-MM-dd")</td>
+                    <td>@t.TipoTransaccion</td>
+                    <td>@t.TitularOrigen</td>
+                    <td>@t.TitularDestino</td>
+                    <td>@t.NumeroPatente</td>
+                    <td>@t.Marca</td>
+                    <td>@t.Modelo</td>
+                    <td>@t.CostoOperacion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model != null)
+{
+    <p class="mt-4 text-danger">No se encontraron transacciones para ese DNI.</p>
+}

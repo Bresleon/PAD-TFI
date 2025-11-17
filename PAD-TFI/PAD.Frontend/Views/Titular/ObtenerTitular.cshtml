@@ -1,0 +1,53 @@
+﻿@model PAD.Frontend.Models.TitularDto
+
+<h2>Obtener Titular por CUIL</h2>
+
+<form asp-action="ObtenerPorCuil" method="get">
+    <div class="form-group">
+        <label>CUIL</label>
+        <input type="text" name="cuil" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+</form>
+
+<hr />
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
+@if (Model != null)
+{
+    <h3>Datos del Titular</h3>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Nombre</th>
+            <td>@Model.Nombre</td>
+        </tr>
+        <tr>
+            <th>Apellido</th>
+            <td>@Model.Apellido</td>
+        </tr>
+        <tr>
+            <th>DNI</th>
+            <td>@Model.Dni</td>
+        </tr>
+        <tr>
+            <th>CUIL</th>
+            <td>@Model.Cuil</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+        <tr>
+            <th>Teléfono</th>
+            <td>@Model.Telefono</td>
+        </tr>
+    </table>
+}

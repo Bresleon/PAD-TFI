@@ -1,0 +1,57 @@
+﻿@model PAD.Frontend.Models.VehiculoDto
+
+<h2>Obtener Vehículo por Patente</h2>
+
+<form asp-action="ObtenerPorPatente" method="get">
+    <div class="form-group">
+        <label>Patente</label>
+        <input type="text" name="patente" class="form-control" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+</form>
+
+<hr />
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.Error
+    </div>
+}
+
+@if (Model != null)
+{
+    <h3>Datos del Vehículo</h3>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Marca</th>
+            <td>@Model.Marca</td>
+        </tr>
+        <tr>
+            <th>Modelo</th>
+            <td>@Model.Modelo</td>
+        </tr>
+        <tr>
+            <th>Categoría</th>
+            <td>@Model.Categoria</td>
+        </tr>
+        <tr>
+            <th>Precio</th>
+            <td>$@Model.Precio</td>
+        </tr>
+        <tr>
+            <th>Fecha Fabricación</th>
+            <td>@Model.FechaFabricacion.ToString("yyyy-MM-dd")</td>
+        </tr>
+        <tr>
+            <th>Número Chasis</th>
+            <td>@Model.NumeroChasis</td>
+        </tr>
+        <tr>
+            <th>Número Motor</th>
+            <td>@Model.NumeroMotor</td>
+        </tr>
+    </table>
+}

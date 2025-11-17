@@ -1,0 +1,221 @@
+﻿@{
+    ViewData["Title"] = "Generar Nueva Patente";
+}
+
+<div class="container mt-5">
+
+    <h2>Generar Nueva Patente</h2>
+    <hr />
+
+    <div class="card p-3 mb-4">
+        <h4>Buscar Persona</h4>
+        <p>Busqueda de persona mediante RENAPER</p>
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input id="inputCuil" type="text" class="form-control" placeholder="Ingrese CUIL">
+            </div>
+
+            <button id="btnBuscarPersona" class="btn btn-primary w-auto mx-auto " onclick="buscarPersona()">
+                Buscar
+            </button>
+
+        </div>
+
+        <div id="loadingPersona" class="alert alert-info mt-3" style="display:none;">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <span>Buscando Persona...</span>
+            </div>
+        </div>
+
+        <div id="msgBusqueda" class="mt-3"></div>
+
+        <div id="datosPersona" class="mt-3" style="display:none;">
+            <h5>Datos de Persona </h5>
+            <ul class="list-group">
+                <li class="list-group-item"><b>Nombre:</b> <span id="pNombre"></span></li>
+                <li class="list-group-item"><b>Apellido:</b> <span id="pApellido"></span></li>
+                <li class="list-group-item"><b>DNI:</b> <span id="pDni"></span></li>
+                <li class="list-group-item"><b>Dirección:</b> <span id="pDireccion"></span></li>
+                <li class="list-group-item"><b>Teléfono:</b> <span id="pTelefono"></span></li>
+                <li class="list-group-item"><b>Email:</b> <span id="pMail"></span></li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="formPatente" class="card p-3" style="display:none;">
+        <h4>Datos del Vehículo</h4>
+
+        <div class="row g-3 mt-2">
+            <div class="col-md-4">
+                <label>Marca</label>
+                <input id="marca" name="marca" class="form-control" type="text">
+            </div>
+
+            <div class="col-md-4">
+                <label>Modelo</label>
+                <input id="modelo" name="modelo" class="form-control" type="text">
+            </div>
+
+            <div class="col-md-4">
+                <label>Categoría</label>
+                <input id="categoria" name="categoria" class="form-control" type="number">
+            </div>
+
+            <div class="col-md-4">
+                <label>Precio</label>
+                <input id="precio" name="precio" class="form-control" type="number">
+            </div>
+
+            <div class="col-md-4">
+                <label>Fecha de Fabricación</label>
+                <input id="fechaFabricacion" name="fechaFabricacion" class="form-control" type="date">
+            </div>
+
+            <div class="col-md-4">
+                <label>Número de Chasis</label>
+                <input id="numeroChasis" name="numeroChasis" class="form-control" type="text">
+            </div>
+
+            <div class="col-md-4">
+                <label>Número de Motor</label>
+                <input id="numeroMotor" name="numeroMotor" class="form-control" type="text">
+            </div>
+        </div>
+
+        <button class="btn btn-success mt-4" onclick="enviarPatente()">Generar Patente</button>
+
+        <div id="msgPatente" class="mt-3">
+        </div>
+
+        <div id="loadingPatente" class="alert alert-info mt-3" style="display:none;">
+            <div class="d-flex flex-column align-items-center justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only"></span>
+                </div>
+                <span>Espere por favor...</span>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+
+    let titularCuil = null;
+
+
+    async function buscarPersona() {
+        const cuilInput = document.getElementById("inputCuil");
+        const btnBuscar = document.getElementById("btnBuscarPersona");
+        const loading = document.getElementById("loadingPersona");
+        const msgBusqueda = document.getElementById("msgBusqueda");
+
+        const cuil = cuilInput.value.trim();
+
+        msgBusqueda.innerHTML = "";
+        loading.style.display = "block";
+
+        cuilInput.disabled = true;
+        btnBuscar.disabled = true;
+
+        try {
+            const res = await fetch(`/Transaccion/BuscarPersona?cuil=${cuil}`);
+
+            if (!res.ok) {
+                msgBusqueda.innerHTML = `<div class="alert alert-danger">Persona no encontrada</div>`;
+                return;
+            }
+
+            const persona = await res.json();
+            titularCuil = cuil;
+
+            document.getElementById("datosPersona").style.display = "block";
+            document.getElementById("formPatente").style.display = "block";
+            document.getElementById("pNombre").innerText = persona.nombre;
+            document.getElementById("pApellido").innerText = persona.apellido;
+            document.getElementById("pDni").innerText = persona.dni;
+            document.getElementById("pDireccion").innerText = persona.direccion;
+            document.getElementById("pTelefono").innerText = persona.telefono;
+            document.getElementById("pMail").innerText = persona.mail;
+
+            msgBusqueda.innerHTML = `<div class="alert alert-success">Persona encontrada correctamente</div>`;
+        }
+        catch (err) {
+            msgBusqueda.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
+        }
+        finally {
+            cuilInput.disabled = false;
+            btnBuscar.disabled = false;
+            loading.style.display = "none";
+        }
+    }
+
+    async function enviarPatente() {
+
+        const loading = document.getElementById("loadingPatente");
+        loading.style.display = "block";
+
+        const dto = {
+            titular: titularCuil,
+            marca: document.getElementById("marca").value,
+            modelo: document.getElementById("modelo").value,
+            categoria: Number(document.getElementById("categoria").value),
+            precio: Number(document.getElementById("precio").value),
+            fechaFabricacion: document.getElementById("fechaFabricacion").value,
+            numeroChasis: document.getElementById("numeroChasis").value,
+            numeroMotor: document.getElementById("numeroMotor").value
+        };
+
+
+        console.log("DTO enviado:", dto);
+        console.log("JSON:", JSON.stringify(dto));
+
+        try{
+        const res = await fetch("/Transaccion/GenerarPatente", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                titular: titularCuil,
+                marca: marca.value,
+                modelo: modelo.value,
+                categoria: Number(categoria.value),
+                precio: Number(precio.value),
+                fechaFabricacion: fechaFabricacion.value,
+                numeroChasis: numeroChasis.value,
+                numeroMotor: numeroMotor.value
+                })
+            });
+
+
+        if (!res.ok) {
+            document.getElementById("msgPatente").innerHTML =
+                `<div class="alert alert-danger">Error al generar patente</div>`;
+            return;
+        }
+
+        const data = await res.json();
+        console.log(data);
+
+        document.getElementById("msgPatente").innerHTML =
+            `<div class="alert alert-success">
+                <ul>
+                    <li>Patente generada: <b>${data.numeroPatente}</b></li>
+                    <li>Costo de Operación: <b>${data.costoOperacion}</b></li>
+                    <li><p><strong>Link de pago:</strong> <a href=${data.linkDePagoMP} target="_blank">Ir al pago</a></p> </li>
+                </ul>
+            </div>`;
+
+        }catch(err){
+            console.error("Error en enviarPatente:", err);
+        }
+        finally{
+            loading.style.display = "none";
+        }
+
+    }
+
+</script>

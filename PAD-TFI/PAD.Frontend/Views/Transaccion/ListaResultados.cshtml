@@ -1,0 +1,36 @@
+﻿@model List<TransaccionResponseDto>
+
+<h2>Resultados</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning mt-4">No se encontraron resultados.</div>
+}
+else
+{
+    <table class="table table-bordered table-striped mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha</th>
+                <th>Titular Destino</th>
+                <th>Tipo</th>
+                <th>Patente</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.FechaTransaccion</td>
+                    <td>@t.TitularDestino</td>
+                    <td>@t.TipoTransaccion</td>
+                    <td>@t.NumeroPatente</td>
+                    <td>@t.Marca</td>
+                    <td>@t.Modelo</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

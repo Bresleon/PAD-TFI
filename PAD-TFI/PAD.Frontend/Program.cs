@@ -1,7 +1,16 @@
+using PAD.Frontend.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpClient<TransaccionService>();
+builder.Services.AddHttpClient<TitularService>();
+builder.Services.AddHttpClient<VehiculoService>();
+builder.Services.AddHttpClient("BackendApi", client =>
+{
+    client.BaseAddress = new Uri("https://localhost:7213/"); 
+});
 
 var app = builder.Build();
 
