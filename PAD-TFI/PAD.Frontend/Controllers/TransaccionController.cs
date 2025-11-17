@@ -1,32 +1,57 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using PAD.Frontend.Models;
 using PAD.Frontend.Services;
-using System.Net.Http;
 
 namespace PAD.Frontend.Controllers
 {
     [IgnoreAntiforgeryToken]
     public class TransaccionController : Controller
     {
-        private readonly TransaccionService _service;
+        private readonly TransaccionService _transaccionServ;
+        private readonly MarcaService _marcaServ;
+        private readonly ModeloService _modeloServ;
         private readonly ILogger<TransaccionController> _logger;
 
-        public TransaccionController(TransaccionService service, ILogger<TransaccionController> logger)
+        public TransaccionController(TransaccionService transaccionServ,
+            MarcaService marcaServ,
+            ModeloService modeloServ,
+            ILogger<TransaccionController> logger)
         {
-            _service = service;
+            _transaccionServ = transaccionServ;
+            _marcaServ = marcaServ;
+            _modeloServ = modeloServ;
             _logger = logger;
         }
 
-        public IActionResult Generar()
+        public async Task<IActionResult> Generar()
         {
-            return View();
+            var marcas = await _marcaServ.ObtenerMarcas();
+
+            var categorias = Enum.GetValues(typeof(CategoriaVehiculo)).Cast<CategoriaVehiculo>();
+
+            var vehiculoVM = new VehiculoViewModel
+            {
+                Marcas = marcas.Select(m => new SelectListItem
+                {
+                    Value = m.Nombre,
+                    Text = m.Nombre
+                }).ToList(),
+
+                Categorias = categorias.Select(c => new SelectListItem
+                {
+                    Value = c.ToString(),
+                    Text = c.ToString()
+                }).ToList()
+            };
+
+            return View(vehiculoVM);
         }
 
         [HttpGet]
         public async Task<IActionResult> BuscarPersona(string cuil)
         {
-            var persona = await _service.ObtenerPersonaPorCuil(cuil);
+            var persona = await _transaccionServ.ObtenerPersonaPorCuil(cuil);
 
             if (persona is null)
                 return NotFound("Persona no encontrada");
@@ -34,12 +59,20 @@ namespace PAD.Frontend.Controllers
             return Json(persona);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> BuscarModelos(string marca)
+        {
+            var modelos = await _modeloServ.ObtenerModelos(marca);
+
+            return Json(new { modelos });
+        }
+
         [HttpPost]
         public async Task<IActionResult> GenerarPatente([FromBody] TransaccionAltaRequestDto dto)
         {
             try
             {
-                var resultado = await _service.GenerarNuevaPatente(dto);
+                var resultado = await _transaccionServ.GenerarNuevaPatente(dto);
                 return Ok(resultado);
             }
             catch (Exception ex)
@@ -60,7 +93,7 @@ namespace PAD.Frontend.Controllers
         {
             try
             {
-                var response = await _service.TransferirPatente(request);
+                var response = await _transaccionServ.TransferirPatente(request);
                 return Json(response);
             }
             catch (Exception ex)
@@ -77,13 +110,13 @@ namespace PAD.Frontend.Controllers
 
         public async Task<IActionResult> Obtener(DateTime desde, DateTime? hasta)
         {
-            var resultado = await _service.ObtenerPorRangoAsync(desde, hasta);
+            var resultado = await _transaccionServ.ObtenerPorRangoAsync(desde, hasta);
 
             return View("Obtener", resultado);
         }
         public async Task<IActionResult> ObtenerPorDni(string dni)
         {
-            var resultado = await _service.ObtenerPorDniAsync(dni);
+            var resultado = await _transaccionServ.ObtenerPorDniAsync(dni);
             return View("ObtenerPorDni", resultado);
         }
 

@@ -23,6 +23,8 @@ builder.Services.AddScoped<TitularService>();
 builder.Services.AddScoped<PatenteService>();
 builder.Services.AddScoped<VehiculoService>();
 builder.Services.AddScoped<MercadoPagoService>();
+builder.Services.AddScoped<MarcaService>();
+builder.Services.AddScoped<ModeloService>();
 
 
 builder.Services.AddControllers();

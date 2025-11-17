@@ -7,6 +7,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient<TransaccionService>();
 builder.Services.AddHttpClient<TitularService>();
 builder.Services.AddHttpClient<VehiculoService>();
+builder.Services.AddHttpClient<MarcaService>();
+builder.Services.AddHttpClient<ModeloService>();
 builder.Services.AddHttpClient("BackendApi", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7213/"); 

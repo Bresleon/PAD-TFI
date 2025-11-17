@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Generar Nueva Patente";
 }
-
 <div class="container mt-5">
 
     <h2>Generar Nueva Patente</h2>
@@ -51,17 +50,26 @@
         <div class="row g-3 mt-2">
             <div class="col-md-4">
                 <label>Marca</label>
-                <input id="marca" name="marca" class="form-control" type="text">
+                @* <input id="marca" name="marca" class="form-control" type="text"> *@
+                <select asp-items="Model.Marcas" class="form-select" id="slctMarca" onchange="buscarModelos()">
+                    <option selected disabled>Seleccione una marca</option>
+                </select>
             </div>
 
             <div class="col-md-4">
                 <label>Modelo</label>
-                <input id="modelo" name="modelo" class="form-control" type="text">
+                @* <input id="modelo" name="modelo" class="form-control" type="text"> *@
+                <select class="form-select" id="slctModelo">
+                    <option selected disabled>Seleccione un modelo</option>
+                </select>
             </div>
 
             <div class="col-md-4">
                 <label>Categoría</label>
-                <input id="categoria" name="categoria" class="form-control" type="number">
+                @* <input id="categoria" name="categoria" class="form-control" type="number"> *@
+                <select asp-items="Model.Categorias" class="form-select" id="slctCategoria">
+                    <option selected disabled>Seleccione una categoria</option>
+                </select>
             </div>
 
             <div class="col-md-4">
@@ -104,9 +112,7 @@
 </div>
 
 <script>
-
     let titularCuil = null;
-
 
     async function buscarPersona() {
         const cuilInput = document.getElementById("inputCuil");
@@ -151,6 +157,42 @@
             cuilInput.disabled = false;
             btnBuscar.disabled = false;
             loading.style.display = "none";
+        }
+    }
+
+    async function buscarModelos() {
+        try {
+            const slctMarca = document.getElementById("slctMarca");
+            const slctModelo = document.getElementById("slctModelo");
+            const marca = slctMarca.value.trim();
+
+            slctModelo.innerHTML = '<option selected disabled>Seleccione un modelo</option>';
+
+            fetch(`/Transaccion/BuscarModelos?marca=${marca}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Error en la búsqueda");
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data) {
+                        alert("No se encontraron modelos para esa marca");
+                        return;
+                    }
+
+                    data.modelos.forEach(m => {
+                        const opt = document.createElement("option");
+                        opt.value = m.id;
+                        opt.textContent = m.nombre;
+                        slctModelo.appendChild(opt);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Ocurrió un error al buscar los modelos.");
+                });
+        }
+        catch(err) {
+            msgBusqueda.innerHTML = `<div class="alert alert-danger">Error al conectar con el servidor</div>`;
         }
     }
 
