@@ -62,11 +62,11 @@ public class Iniciales
     {
         Modelos = new List<Modelo>
         {
-            new Modelo { Id = 1, Nombre = "Corolla" },
-            new Modelo { Id = 2, Nombre = "Hilux" },
-            new Modelo { Id = 3, Nombre = "Focus" },
-            new Modelo { Id = 4, Nombre = "Onix" },
-            new Modelo { Id = 5, Nombre = "Gol" }
+            new Modelo { Id = 1, Nombre = "Corolla", MarcaId = 1 },
+            new Modelo { Id = 2, Nombre = "Hilux", MarcaId = 1 },
+            new Modelo { Id = 3, Nombre = "Focus", MarcaId = 2 },
+            new Modelo { Id = 4, Nombre = "Onix", MarcaId = 3 },
+            new Modelo { Id = 5, Nombre = "Gol", MarcaId = 4 }
         };
     }
 
@@ -111,7 +111,6 @@ public class Iniciales
             new Vehiculo
             {
                 Id = 1,
-                MarcaId = 1, // Toyota
                 ModeloId = 1, // Corolla
                 Precio = 15000,
                 FechaFabricacion = new DateOnly(2018, 5, 10),
@@ -122,7 +121,6 @@ public class Iniciales
             new Vehiculo
             {
                 Id = 2,
-                MarcaId = 2, // Ford
                 ModeloId = 3, // Focus
                 Precio = 13000,
                 FechaFabricacion = new DateOnly(2019, 8, 15),
@@ -133,7 +131,6 @@ public class Iniciales
             new Vehiculo
             {
                 Id = 3,
-                MarcaId = 3, // Chevrolet
                 ModeloId = 4, // Onix
                 Precio = 11000,
                 FechaFabricacion = new DateOnly(2020, 3, 20),
