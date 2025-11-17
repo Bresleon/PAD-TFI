@@ -69,7 +69,8 @@ namespace PAD.Backend.Services
         {
             return await _context.Patentes
                 .Include(p => p.Vehiculo) 
-                    .ThenInclude(v => v.Marca) 
+                    .ThenInclude(v => v.Modelo)
+                        .ThenInclude(m => m.Marca)
                 .Include(p => p.Vehiculo)
                     .ThenInclude(v => v.Modelo) 
                 .FirstOrDefaultAsync(p => p.NumeroPatente == numeroPatente);
