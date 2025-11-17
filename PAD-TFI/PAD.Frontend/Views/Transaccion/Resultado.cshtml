@@ -13,12 +13,5 @@
         <p><strong>Año Fabricación:</strong> @Model.AnioFabricacion</p>
         <p><strong>Patente:</strong> @Model.NumeroPatente (@Model.EjemplarPatente)</p>
         <p><strong>Costo:</strong> $@Model.CostoOperacion</p>
-
-        @if (!string.IsNullOrEmpty(Model.LinkDePagoMP))
-        {
-            <a href="@Model.LinkDePagoMP" target="_blank" class="btn btn-success mt-3">
-                Ir al Pago
-            </a>
-        }
     </div>
 </div>

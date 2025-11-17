@@ -1,4 +1,6 @@
-﻿<h2>Buscar Transacciones por Rango de Fecha</h2>
+﻿@model List<TransaccionDto>
+
+<h2>Buscar Transacciones por Rango de Fecha</h2>
 
 <form asp-action="Obtener" method="post" class="mt-4">
 
@@ -16,3 +18,42 @@
 
     <button class="btn btn-primary mt-3">Buscar</button>
 </form>
+
+@if (Model != null && Model.Any())
+{
+    <h3 class="mt-4">Resultados</h3>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Patente</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Costo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model)
+            {
+                <tr>
+                    <td>@t.FechaTransaccion.ToString("yyyy-MM-dd")</td>
+                    <td>@t.TipoTransaccion</td>
+                    <td>@t.TitularOrigen</td>
+                    <td>@t.TitularDestino</td>
+                    <td>@t.NumeroPatente</td>
+                    <td>@t.Marca</td>
+                    <td>@t.Modelo</td>
+                    <td>@t.CostoOperacion</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="mt-4">No hay resultados para mostrar.</p>
+}

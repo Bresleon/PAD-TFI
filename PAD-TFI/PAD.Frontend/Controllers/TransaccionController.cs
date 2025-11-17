@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PAD.Frontend.Services;
+using Newtonsoft.Json;
 using PAD.Frontend.Models;
+using PAD.Frontend.Services;
+using System.Net.Http;
 
 namespace PAD.Frontend.Controllers
 {
@@ -67,11 +69,20 @@ namespace PAD.Frontend.Controllers
             }
         }
 
-
+        [HttpGet]
         public IActionResult Obtener()
         {
-            return View();
+            return View(new List<TransaccionDto>());
         }
+
+        public async Task<IActionResult> Obtener(DateTime desde, DateTime? hasta)
+        {
+            var resultado = await _service.ObtenerPorRangoAsync(desde, hasta);
+
+            return View("Obtener", resultado);
+        }
+
+
 
         public IActionResult ObtenerPorDni()
         {

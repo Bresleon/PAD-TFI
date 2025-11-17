@@ -1,7 +1,9 @@
-﻿using System.Net.Http;
+﻿using Newtonsoft.Json;
+using PAD.Frontend.Models;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
-using PAD.Frontend.Models;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace PAD.Frontend.Services
 {
@@ -32,7 +34,6 @@ namespace PAD.Frontend.Services
             var response = await _http.PostAsJsonAsync(url, dto);
 
             var raw = await response.Content.ReadAsStringAsync();
-            Console.WriteLine("Backend dice:", response);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -63,5 +64,23 @@ namespace PAD.Frontend.Services
                 return null;
             }
         }
+
+        public async Task<List<TransaccionDto>> ObtenerPorRangoAsync(DateTime desde, DateTime? hasta)
+        {
+            string url = $"https://localhost:7213/api/transacciones/obtener-por-rango?desde={desde:yyyy-MM-dd}";
+
+            if (hasta.HasValue)
+                url += $"&hasta={hasta:yyyy-MM-dd}";
+
+            Console.WriteLine("URL usada --> " + url);
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return new List<TransaccionDto>();
+
+            return await response.Content.ReadFromJsonAsync<List<TransaccionDto>>();
+        }
+
+
     }
 }
