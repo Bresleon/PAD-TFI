@@ -17,4 +17,6 @@ public class Patente
     public string NumeroPatente { get; set; }
     public EjemplarPatente Ejemplar { get; set; }
     public DateOnly FechaEmision { get; set; }
+
+    public ICollection<Transaccion> Transacciones { get; set; } = new List<Transaccion>();
 }

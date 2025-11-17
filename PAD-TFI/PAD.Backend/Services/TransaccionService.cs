@@ -35,7 +35,8 @@ public class TransaccionService
             .Include(t => t.TitularOrigen)
             .Include(t => t.Patente)
                 .ThenInclude(p => p.Vehiculo)
-                    .ThenInclude(v => v.Marca)
+                    .ThenInclude(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
             .Include(t => t.Patente)
                 .ThenInclude(p => p.Vehiculo)
                     .ThenInclude(v => v.Modelo);
@@ -52,7 +53,7 @@ public class TransaccionService
             NumeroPatente = t.Patente.NumeroPatente,
             EjemplarPatente = t.Patente.Ejemplar.ToString(),
 
-            Marca = t.Patente.Vehiculo.Marca.Nombre,
+            Marca = t.Patente.Vehiculo.Modelo.Marca.Nombre,
             Modelo = t.Patente.Vehiculo.Modelo.Nombre,
             AnioFabricacion = t.Patente.Vehiculo.FechaFabricacion.Year,
             NumeroMotor = t.Patente.Vehiculo.NumeroMotor,
@@ -77,7 +78,8 @@ public class TransaccionService
             .Include(t => t.TitularOrigen) 
             .Include(t => t.Patente) 
                 .ThenInclude(p => p.Vehiculo)
-                    .ThenInclude(v => v.Marca)
+                    .ThenInclude(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
             .Include(t => t.Patente)
                 .ThenInclude(p => p.Vehiculo)
                     .ThenInclude(v => v.Modelo);
@@ -94,9 +96,9 @@ public class TransaccionService
             TitularDestino = $"{t.TitularDestino.Nombre} {t.TitularDestino.Apellido}", 
          
             NumeroPatente = t.Patente.NumeroPatente,
-            EjemplarPatente = t.Patente.Ejemplar.ToString(), 
-            
-            Marca = t.Patente.Vehiculo.Marca.Nombre,
+            EjemplarPatente = t.Patente.Ejemplar.ToString(),
+
+            Marca = t.Patente.Vehiculo.Modelo.Marca.Nombre,
             Modelo = t.Patente.Vehiculo.Modelo.Nombre,
             AnioFabricacion = t.Patente.Vehiculo.FechaFabricacion.Year, 
             NumeroMotor = t.Patente.Vehiculo.NumeroMotor,
@@ -246,7 +248,7 @@ public class TransaccionService
                 NumeroPatente = patente.NumeroPatente,
                 EjemplarPatente = patente.Ejemplar.ToString(),
 
-                Marca = vehiculo.Marca.Nombre,
+                Marca = vehiculo.Modelo.Marca.Nombre,
                 Modelo = vehiculo.Modelo.Nombre,
                 AnioFabricacion = vehiculo.FechaFabricacion.Year,
                 NumeroMotor = vehiculo.NumeroMotor,

@@ -19,8 +19,8 @@ namespace PAD.Backend.Services
         {
 
             return await _context.Vehiculos
-                .Include(v => v.Marca)
                 .Include(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
                 .FirstOrDefaultAsync(v => v.Id == vehiculoId);
         }
 
@@ -56,7 +56,6 @@ namespace PAD.Backend.Services
         {
             var vehiculo = new Vehiculo
             {
-                MarcaId = marcaId,
                 ModeloId = modeloId,
                 Categoria = categoria,
                 Precio = precio,
@@ -93,18 +92,15 @@ namespace PAD.Backend.Services
         {
             var vehiculoDto = await _context.Patentes
                 .AsNoTracking()
-
-                .Include(p => p.Vehiculo) 
-                    .ThenInclude(v => v.Marca) 
                 .Include(p => p.Vehiculo)
-                    .ThenInclude(v => v.Modelo) 
-
+                    .ThenInclude(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
+                //.Include(p => p.Vehiculo)
+                //    .ThenInclude(v => v.Modelo) 
                 .Where(p => p.NumeroPatente == patenteNumero)
-
-              
                 .Select(p => new VehiculoResponseDto 
                 {
-                    Marca = p.Vehiculo.Marca.Nombre,
+                    Marca = p.Vehiculo.Modelo.Marca.Nombre,
                     Modelo = p.Vehiculo.Modelo.Nombre,
                     Categoria = p.Vehiculo.Categoria.ToString(),
                     Precio = p.Vehiculo.Precio,

@@ -35,7 +35,6 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("marcas");
             entity.HasKey(m => m.Id);
             entity.Property(m => m.Id).ValueGeneratedOnAdd();
-
             entity.Property(m => m.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -51,10 +50,12 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("modelos");
             entity.HasKey(m => m.Id);
             entity.Property(m => m.Id).ValueGeneratedOnAdd();
-
             entity.Property(m => m.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
+            entity.HasOne(m => m.Marca)
+                .WithMany(ma => ma.Modelos)
+                .HasForeignKey(m => m.MarcaId);
 
             entity.HasData(Iniciales.Instance.Modelos);
         });
@@ -67,28 +68,22 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("vehiculos");
             entity.HasKey(v => v.Id);
             entity.Property(v => v.Id).ValueGeneratedOnAdd();
-
             entity.Property(v => v.Precio)
                 .HasColumnType("decimal(18,2)");
-
             entity.Property(v => v.NumeroChasis)
                 .IsRequired()
                 .HasMaxLength(100);
-
             entity.Property(v => v.NumeroMotor)
                 .IsRequired()
                 .HasMaxLength(100);
-
             entity.Property(v => v.Categoria)
                 .HasConversion<string>();
-
-            entity.HasOne(v => v.Marca)
-                .WithMany()
-                .HasForeignKey(v => v.MarcaId)
-                .OnDelete(DeleteBehavior.Restrict);
-
+            //entity.HasOne(v => v.Marca)
+            //    .WithMany()
+            //    .HasForeignKey(v => v.MarcaId)
+            //    .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(v => v.Modelo)
-                .WithMany()
+                .WithMany(m => m.Vehiculos)
                 .HasForeignKey(v => v.ModeloId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -103,22 +98,17 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("titulares");
             entity.HasKey(t => t.Id);
             entity.Property(t => t.Id).ValueGeneratedOnAdd();
-
             entity.Property(t => t.Nombre)
                 .IsRequired()
                 .HasMaxLength(100);
-
             entity.Property(t => t.Apellido)
                 .IsRequired()
                 .HasMaxLength(100);
-
             entity.Property(t => t.Dni)
                 .IsRequired()
                 .HasMaxLength(20);
-
             entity.Property(t => t.Email)
                 .HasMaxLength(100);
-
             entity.Property(t => t.Telefono)
                 .HasMaxLength(50);
 
@@ -133,24 +123,19 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("patentes");
             entity.HasKey(p => p.Id);
             entity.Property(p => p.Id).ValueGeneratedOnAdd();
-
             entity.Property(p => p.NumeroPatente)
                 .IsRequired()
                 .HasMaxLength(20);
-
             entity.Property(p => p.FechaEmision)
                 .IsRequired();
-
             entity.Property(p => p.Ejemplar)
                 .HasConversion<string>();
-
             entity.HasOne(p => p.Vehiculo)
                 .WithMany()
                 .HasForeignKey(p => p.VehiculoId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             entity.HasOne(p => p.Titular)
-                .WithMany()
+                .WithMany(t => t.Patentes)
                 .HasForeignKey(p => p.TitularId)
                 .OnDelete(DeleteBehavior.Restrict);
 
@@ -165,26 +150,20 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("transacciones");
             entity.HasKey(t => t.Id);
             entity.Property(t => t.Id).ValueGeneratedOnAdd();
-
             entity.Property(t => t.Costo)
                 .HasColumnType("decimal(18,2)");
-
             entity.Property(t => t.TipoTransaccion)
                 .HasConversion<string>();
-
             entity.Property(t => t.Fecha)
                 .IsRequired();
-
             entity.HasOne(t => t.Patente)
-                .WithMany()
+                .WithMany(p => p.Transacciones)
                 .HasForeignKey(t => t.PatenteId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             entity.HasOne(t => t.TitularOrigen)
-                .WithMany()
+                .WithMany(ti => ti.Transacciones)
                 .HasForeignKey(t => t.TitularOrigenId)
                 .OnDelete(DeleteBehavior.Restrict);
-
             entity.HasOne(t => t.TitularDestino)
                 .WithMany()
                 .HasForeignKey(t => t.TitularDestinoId)
