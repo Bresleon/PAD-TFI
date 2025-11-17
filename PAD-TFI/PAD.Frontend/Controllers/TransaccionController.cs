@@ -81,13 +81,13 @@ namespace PAD.Frontend.Controllers
 
             return View("Obtener", resultado);
         }
-
-
-
-        public IActionResult ObtenerPorDni()
+        public async Task<IActionResult> ObtenerPorDni(string dni)
         {
-            return View();
+            var resultado = await _service.ObtenerPorDniAsync(dni);
+            return View("ObtenerPorDni", resultado);
         }
+
+
 
     }
 }

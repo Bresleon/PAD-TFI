@@ -72,7 +72,7 @@ namespace PAD.Frontend.Services
             if (hasta.HasValue)
                 url += $"&hasta={hasta:yyyy-MM-dd}";
 
-            Console.WriteLine("URL usada --> " + url);
+            
             var response = await _http.GetAsync(url);
 
             if (!response.IsSuccessStatusCode)
@@ -80,6 +80,21 @@ namespace PAD.Frontend.Services
 
             return await response.Content.ReadFromJsonAsync<List<TransaccionDto>>();
         }
+
+        public async Task<List<TransaccionDto>> ObtenerPorDniAsync(string dni)
+        {
+            string url = $"https://localhost:7213/api/transacciones/obtener-por-dni?dni={dni}";
+            Console.WriteLine("URL usada --> " + url);
+
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+                return new List<TransaccionDto>();
+
+            return await response.Content.ReadFromJsonAsync<List<TransaccionDto>>();
+        }
+
+
 
 
     }
