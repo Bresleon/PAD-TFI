@@ -25,5 +25,24 @@ namespace PAD.Frontend.Services
                 return null;
             }
         }
+
+        public async Task<List<VehiculoDto>> ObtenerVehiculosPorCuil(string cuil)
+        {
+            try
+            {
+                var url = $"https://localhost:7213/api/titulares/{cuil}/vehiculos";
+                return await _httpClient.GetFromJsonAsync<List<VehiculoDto>>(url);
+            }
+            catch (HttpRequestException ex)
+            {
+                Console.WriteLine($"Error al obtener vehículos: {ex.Message}");
+                return new List<VehiculoDto>(); 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error inesperado: {ex.Message}");
+                return new List<VehiculoDto>();
+            }
+        }
     }
 }

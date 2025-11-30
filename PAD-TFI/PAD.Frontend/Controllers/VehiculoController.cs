@@ -32,5 +32,27 @@ namespace PAD.Frontend.Controllers
 
             return View("ObtenerVehiculo", vehiculo);
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ObtenerPorCuil(string cuil)
+        {
+            if (string.IsNullOrEmpty(cuil))
+            {
+                return View("ListadoPorCuil");
+            }
+
+            try
+            {
+                var vehiculos = await _service.ObtenerVehiculosPorCuil(cuil);
+                return View("ListadoPorCuil", vehiculos ?? new List<VehiculoDto>());
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = $"Error al buscar vehículos: {ex.Message}";
+                return View("ListadoPorCuil", new List<VehiculoDto>());
+            }
+        }
+
     }
 }
