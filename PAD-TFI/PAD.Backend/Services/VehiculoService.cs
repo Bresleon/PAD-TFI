@@ -106,7 +106,8 @@ namespace PAD.Backend.Services
                     Precio = p.Vehiculo.Precio,
                     FechaFabricacion = p.Vehiculo.FechaFabricacion,
                     NumeroChasis = p.Vehiculo.NumeroChasis,
-                    NumeroMotor = p.Vehiculo.NumeroMotor
+                    NumeroMotor = p.Vehiculo.NumeroMotor,
+                    NumeroPatente = patenteNumero
                 })
                 .FirstOrDefaultAsync();
 
@@ -127,7 +128,8 @@ namespace PAD.Backend.Services
                    Precio = p.Vehiculo.Precio,
                    FechaFabricacion = p.Vehiculo.FechaFabricacion,
                    NumeroChasis = p.Vehiculo.NumeroChasis,
-                   NumeroMotor = p.Vehiculo.NumeroMotor
+                   NumeroMotor = p.Vehiculo.NumeroMotor,
+                   NumeroPatente = p.NumeroPatente
                })
                .ToListAsync();
                 }
