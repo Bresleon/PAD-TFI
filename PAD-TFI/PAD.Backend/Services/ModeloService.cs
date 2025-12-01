@@ -18,7 +18,7 @@ public class ModeloService
         var modelos = _context.Modelos.Where(m => string.Equals(m.Marca.Nombre, marca));
 
         var modelosDto = await modelos
-            .Select(m => new ModeloDto { Id = m.Id, Nombre = m.Nombre })
+            .Select(m => new ModeloDto { Nombre = m.Nombre })
             .ToListAsync();
 
         return modelosDto;
