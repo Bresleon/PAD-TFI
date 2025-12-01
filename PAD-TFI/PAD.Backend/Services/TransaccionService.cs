@@ -119,13 +119,18 @@ public class TransaccionService
 
             int marcaId = await _vehiculoService.ObtenerMarcaIdPorNombreAsync(request.Marca);
             int modeloId = await _vehiculoService.ObtenerModeloIdPorNombreAsync(request.Modelo);
+
+            var categoria = Enum.GetValues<CategoriaVehiculo>().ElementAt(request.Categoria);
+            var fechaFabricacion = DateOnly.FromDateTime(request.FechaFabricacion);
+
             await _vehiculoService.ValidarUnicidadVehiculoAsync(
                 request.NumeroChasis,
                 request.NumeroMotor
             );
+
             var vehiculo = _vehiculoService.CrearVehiculo(
-                marcaId, modeloId, request.Categoria,
-                request.Precio, request.FechaFabricacion,
+                marcaId, modeloId, categoria,
+                request.Precio, fechaFabricacion,
                 request.NumeroChasis, request.NumeroMotor
             );
 

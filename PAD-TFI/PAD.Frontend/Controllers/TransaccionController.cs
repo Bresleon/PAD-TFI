@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using PAD.Frontend.Models;
 using PAD.Frontend.Services;
 
@@ -28,7 +29,7 @@ namespace PAD.Frontend.Controllers
         {
             var marcas = await _marcaServ.ObtenerMarcas();
 
-            var categorias = Enum.GetValues(typeof(CategoriaVehiculo)).Cast<CategoriaVehiculo>();
+            List<CategoriaVehiculo> categorias = Enum.GetValues(typeof(CategoriaVehiculo)).Cast<CategoriaVehiculo>().ToList();
 
             var vehiculoVM = new VehiculoViewModel
             {
@@ -40,7 +41,7 @@ namespace PAD.Frontend.Controllers
 
                 Categorias = categorias.Select(c => new SelectListItem
                 {
-                    Value = c.ToString(),
+                    Value = categorias.IndexOf(c).ToString(),
                     Text = c.ToString()
                 }).ToList()
             };
