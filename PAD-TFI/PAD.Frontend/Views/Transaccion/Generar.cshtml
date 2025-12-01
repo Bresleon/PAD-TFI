@@ -113,6 +113,9 @@
 
 <script>
     let titularCuil = null;
+    const slctMarca = document.getElementById("slctMarca");
+    const slctModelo = document.getElementById("slctModelo");
+    const slctCategoria = document.getElementById("slctCategoria");
 
     async function buscarPersona() {
         const cuilInput = document.getElementById("inputCuil");
@@ -162,8 +165,6 @@
 
     async function buscarModelos() {
         try {
-            const slctMarca = document.getElementById("slctMarca");
-            const slctModelo = document.getElementById("slctModelo");
             const marca = slctMarca.value.trim();
 
             slctModelo.innerHTML = '<option selected disabled>Seleccione un modelo</option>';
@@ -181,7 +182,7 @@
 
                     data.modelos.forEach(m => {
                         const opt = document.createElement("option");
-                        opt.value = m.id;
+                        opt.value = m.nombre;
                         opt.textContent = m.nombre;
                         slctModelo.appendChild(opt);
                     });
@@ -203,9 +204,9 @@
 
         const dto = {
             titular: titularCuil,
-            marca: document.getElementById("marca").value,
-            modelo: document.getElementById("modelo").value,
-            categoria: Number(document.getElementById("categoria").value),
+            marca: slctMarca.value,
+            modelo: slctModelo.value,
+            categoria: slctCategoria.value,
             precio: Number(document.getElementById("precio").value),
             fechaFabricacion: document.getElementById("fechaFabricacion").value,
             numeroChasis: document.getElementById("numeroChasis").value,
@@ -216,42 +217,33 @@
         console.log("DTO enviado:", dto);
         console.log("JSON:", JSON.stringify(dto));
 
-        try{
-        const res = await fetch("/Transaccion/GenerarPatente", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                titular: titularCuil,
-                marca: marca.value,
-                modelo: modelo.value,
-                categoria: Number(categoria.value),
-                precio: Number(precio.value),
-                fechaFabricacion: fechaFabricacion.value,
-                numeroChasis: numeroChasis.value,
-                numeroMotor: numeroMotor.value
-                })
+        try {
+            const res = await fetch("/Transaccion/GenerarPatente", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dto)
             });
 
 
-        if (!res.ok) {
+            if (!res.ok) {
+                document.getElementById("msgPatente").innerHTML =
+                    `<div class="alert alert-danger">Error al generar patente</div>`;
+                return;
+            }
+
+            const data = await res.json();
+            console.log(data);
+
             document.getElementById("msgPatente").innerHTML =
-                `<div class="alert alert-danger">Error al generar patente</div>`;
-            return;
-        }
+                `<div class="alert alert-success">
+                    <ul>
+                        <li>Patente generada: <b>${data.numeroPatente}</b></li>
+                        <li>Costo de Operación: <b>${data.costoOperacion}</b></li>
+                        <li><p><strong>Link de pago:</strong> <a href=${data.linkDePagoMP} target="_blank">Ir al pago</a></p> </li>
+                    </ul>
+                </div>`;
 
-        const data = await res.json();
-        console.log(data);
-
-        document.getElementById("msgPatente").innerHTML =
-            `<div class="alert alert-success">
-                <ul>
-                    <li>Patente generada: <b>${data.numeroPatente}</b></li>
-                    <li>Costo de Operación: <b>${data.costoOperacion}</b></li>
-                    <li><p><strong>Link de pago:</strong> <a href=${data.linkDePagoMP} target="_blank">Ir al pago</a></p> </li>
-                </ul>
-            </div>`;
-
-        }catch(err){
+        } catch(err) {
             console.error("Error en enviarPatente:", err);
         }
         finally{
