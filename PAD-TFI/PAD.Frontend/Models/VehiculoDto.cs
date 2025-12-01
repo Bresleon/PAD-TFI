@@ -9,5 +9,6 @@
         public DateTime FechaFabricacion { get; set; }
         public string NumeroChasis { get; set; }
         public string NumeroMotor { get; set; }
+        public string NumeroPatente { get; set; }
     }
 }

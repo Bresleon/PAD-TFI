@@ -106,11 +106,32 @@ namespace PAD.Backend.Services
                     Precio = p.Vehiculo.Precio,
                     FechaFabricacion = p.Vehiculo.FechaFabricacion,
                     NumeroChasis = p.Vehiculo.NumeroChasis,
-                    NumeroMotor = p.Vehiculo.NumeroMotor
+                    NumeroMotor = p.Vehiculo.NumeroMotor,
+                    NumeroPatente = patenteNumero
                 })
                 .FirstOrDefaultAsync();
 
             return vehiculoDto;
         }
+
+        public async Task<List<VehiculoResponseDto>> ObtenerVehiculosPorCuilAsync(string cuil)
+        {
+            return await _context.Titulares
+               .AsNoTracking()
+               .Where(t => t.Cuil == cuil)
+               .SelectMany(t => t.Patentes)
+               .Select(p => new VehiculoResponseDto
+               {
+                   Marca = p.Vehiculo.Modelo.Marca.Nombre,
+                   Modelo = p.Vehiculo.Modelo.Nombre,
+                   Categoria = p.Vehiculo.Categoria.ToString(),
+                   Precio = p.Vehiculo.Precio,
+                   FechaFabricacion = p.Vehiculo.FechaFabricacion,
+                   NumeroChasis = p.Vehiculo.NumeroChasis,
+                   NumeroMotor = p.Vehiculo.NumeroMotor,
+                   NumeroPatente = p.NumeroPatente
+               })
+               .ToListAsync();
+                }
     }
 }

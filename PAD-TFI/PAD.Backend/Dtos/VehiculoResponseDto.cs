@@ -17,5 +17,7 @@ namespace PAD.Backend.Dtos
         public string NumeroChasis { get; set; }
 
         public string NumeroMotor { get; set; }
+
+        public string NumeroPatente { get; set; }   
     }
 }
