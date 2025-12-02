@@ -24,12 +24,12 @@ namespace PAD.Frontend.Services
 
         public async Task<PersonaResponseDto?> ObtenerPersonaPorCuil(string cuil)
         {
-            var url = $"https://localhost:7213/api/personas/por-cuil/{cuil}";
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/personas/por-cuil/{cuil}";
             return await _http.GetFromJsonAsync<PersonaResponseDto>(url, _jsonOptions);
         }
         public async Task<TransaccionResponseDto?> GenerarNuevaPatente(TransaccionAltaRequestDto dto)
         {
-            var url = $"https://localhost:7213/api/transacciones/generar-nueva-patente";
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/transacciones/generar-nueva-patente";
 
             var response = await _http.PostAsJsonAsync(url, dto);
 
@@ -44,7 +44,7 @@ namespace PAD.Frontend.Services
         }
         public async Task<TransaccionTransferenciaResponseDto> TransferirPatente(TransaccionTransferenciaRequestDto dto)
         {
-            var url = $"https://localhost:7213/api/transacciones/transferir-patente";
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/transacciones/transferir-patente";
             try
             {
                 var response = await _http.PostAsJsonAsync(url, dto);
@@ -67,7 +67,7 @@ namespace PAD.Frontend.Services
 
         public async Task<List<TransaccionDto>> ObtenerPorRangoAsync(DateTime desde, DateTime? hasta)
         {
-            string url = $"https://localhost:7213/api/transacciones/obtener-por-rango?desde={desde:yyyy-MM-dd}";
+            string url = $"https://elva-taxational-crysta.ngrok-free.dev/api/transacciones/obtener-por-rango?desde={desde:yyyy-MM-dd}";
 
             if (hasta.HasValue)
                 url += $"&hasta={hasta:yyyy-MM-dd}";
@@ -83,7 +83,7 @@ namespace PAD.Frontend.Services
 
         public async Task<List<TransaccionDto>> ObtenerPorDniAsync(string dni)
         {
-            string url = $"https://localhost:7213/api/transacciones/obtener-por-dni?dni={dni}";
+            string url = $"https://elva-taxational-crysta.ngrok-free.dev/api/transacciones/obtener-por-dni?dni={dni}";
             Console.WriteLine("URL usada --> " + url);
 
             var response = await _http.GetAsync(url);

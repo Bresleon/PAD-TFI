@@ -17,7 +17,7 @@ namespace PAD.Frontend.Services
         {
             try
             {
-                var url = $"https://localhost:7213/api/vehiculos/obtener-por-pantente?patente={patente}";
+                var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/vehiculos/obtener-por-pantente?patente={patente}";
                 return await _httpClient.GetFromJsonAsync<VehiculoDto>(url);
             }
             catch
@@ -30,7 +30,7 @@ namespace PAD.Frontend.Services
         {
             try
             {
-                var url = $"https://localhost:7213/api/titulares/{cuil}/vehiculos";
+                var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/titulares/{cuil}/vehiculos";
                 return await _httpClient.GetFromJsonAsync<List<VehiculoDto>>(url);
             }
             catch (HttpRequestException ex)

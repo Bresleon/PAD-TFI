@@ -15,7 +15,7 @@ public class MarcaService
     {
         try
         {
-            var url = $"https://localhost:7213/api/marcas";
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/marcas";
             return (await _httpClient.GetFromJsonAsync<List<MarcaDto>>(url))!;
         }
         catch

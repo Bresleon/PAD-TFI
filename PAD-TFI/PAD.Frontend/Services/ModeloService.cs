@@ -15,7 +15,7 @@ public class ModeloService
     {
         try
         {
-            var url = $"https://localhost:7213/api/modelos/{marca}";
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/modelos/{marca}";
             return (await _httpClient.GetFromJsonAsync<List<ModeloDto>>(url))!;
         }
         catch

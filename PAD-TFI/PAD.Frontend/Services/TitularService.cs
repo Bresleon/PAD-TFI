@@ -13,7 +13,7 @@ namespace PAD.Frontend.Services
 
         public async Task<TitularDto?> ObtenerPorCuilAsync(string cuil)
         {
-            string url = $"https://localhost:7213/api/titulares/obtener-por-cuil?cuil={cuil}";
+            string url = $"https://elva-taxational-crysta.ngrok-free.dev/api/titulares/obtener-por-cuil?cuil={cuil}";
             Console.WriteLine("URL usada --> " + url);
 
             var response = await _http.GetAsync(url);
