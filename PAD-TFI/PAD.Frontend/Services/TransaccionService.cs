@@ -24,9 +24,18 @@ namespace PAD.Frontend.Services
 
         public async Task<PersonaResponseDto?> ObtenerPersonaPorCuil(string cuil)
         {
-            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/personas/por-cuil/{cuil}";
-            return await _http.GetFromJsonAsync<PersonaResponseDto>(url, _jsonOptions);
+            var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/titulares/obtener-por-cuil?cuil={cuil}";
+            var response = await _http.GetAsync(url);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                url = $"https://elva-taxational-crysta.ngrok-free.dev/api/personas/por-cuil/{cuil}";
+                return await _http.GetFromJsonAsync<PersonaResponseDto>(url, _jsonOptions);
+            }
+            
+            return await response.Content.ReadFromJsonAsync<PersonaResponseDto>(_jsonOptions);
         }
+
         public async Task<TransaccionResponseDto?> GenerarNuevaPatente(TransaccionAltaRequestDto dto)
         {
             var url = $"https://elva-taxational-crysta.ngrok-free.dev/api/transacciones/generar-nueva-patente";
